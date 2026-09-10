@@ -1,0 +1,822 @@
+/* ============================================================
+   GUARDIAN — brand film (/demo)
+   Swiss-editorial kinetic typography on pure black.
+   Reuses KILN ZEN :root tokens (globals.css). Transform/opacity
+   animation only. All entrance keyframes are FROM-only, so the
+   element's base style IS the settled state — the ?scene=N
+   freeze simply disables animation (.settled).
+   ============================================================ */
+
+.film {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  --hl-ink: rgba(243, 237, 228, 0.12);
+  --blue: #7db3e3;
+  --lav: #c7b8e8;
+}
+
+/* the 16:9 filmic stage, letterboxed inside any viewport */
+.stage {
+  position: relative;
+  width: min(100vw, calc(100dvh * (16 / 9)));
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+  container-type: size;
+  font-family: var(--font-sans);
+  color: var(--fg);
+  user-select: none;
+}
+
+/* dev-only: keep the Next.js devtools badge out of the frame */
+nextjs-portal {
+  display: none !important;
+}
+
+/* freeze: every element sits at its base (= settled) style */
+.settled *,
+.settled *::before,
+.settled *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ---------------- scenes ---------------- */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+/* each scene's inner wrapper fills the stage (canvas measures it) */
+.scene > div {
+  position: absolute;
+  inset: 0;
+}
+.scene.out {
+  z-index: 0;
+  animation: kf-out 480ms var(--ease-smooth) forwards;
+}
+@keyframes kf-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------------- animation utilities (from-only) ---------------- */
+
+.a-fade {
+  animation: kf-fade var(--t, 700ms) var(--ease-smooth) both;
+  animation-delay: var(--d, 0ms);
+}
+.a-rise {
+  animation: kf-rise var(--t, 850ms) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.a-pop {
+  animation: kf-pop var(--t, 600ms) var(--ease-squish) both;
+  animation-delay: var(--d, 0ms);
+}
+.a-letter {
+  display: inline-block;
+  animation: kf-letter 640ms var(--ease-out) both;
+  animation-delay: calc(260ms + var(--i, 0) * 70ms);
+}
+.a-settle {
+  animation: kf-settle 4200ms var(--ease-out) both;
+}
+.a-drawx {
+  transform-origin: var(--o, left center);
+  animation: kf-drawx var(--t, 900ms) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.a-drawy {
+  transform-origin: var(--o, center top);
+  animation: kf-drawy var(--t, 900ms) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes kf-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes kf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.6cqh) scale(0.995);
+  }
+}
+@keyframes kf-pop {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+@keyframes kf-letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.28em) scale(1.1);
+  }
+}
+@keyframes kf-settle {
+  from {
+    transform: scale(1.04);
+  }
+}
+@keyframes kf-drawx {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes kf-drawy {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+/* gentle infinite pulse — base is fully visible (settled-safe) */
+.pulse {
+  animation-name: kf-pop, kf-breathe;
+  animation-duration: var(--t, 600ms), 2.8s;
+  animation-timing-function: var(--ease-squish), var(--ease-smooth);
+  animation-delay: var(--d, 0ms), calc(var(--d, 0ms) + 600ms);
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: both, none;
+}
+@keyframes kf-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ---------------- shared primitives ---------------- */
+
+.micro {
+  font-size: clamp(8px, 0.86cqw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* hairlines */
+.hl {
+  position: absolute;
+  background: var(--hl-ink);
+}
+.hl.h {
+  height: 1px;
+}
+.hl.v {
+  width: 1px;
+}
+
+/* joint node on a hairline */
+.joint {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin: -1px 0 0 -1px;
+  background: var(--fg-soft);
+  opacity: 0.6;
+}
+
+/* tick mark on an axis */
+.tick {
+  position: absolute;
+  width: 0.6cqw;
+  height: 1px;
+  background: var(--hl-ink);
+}
+
+/* small crosshair */
+.cross {
+  position: absolute;
+  width: 1.2cqw;
+  height: 1.2cqw;
+}
+.cross::before,
+.cross::after {
+  content: "";
+  position: absolute;
+  background: rgba(243, 237, 228, 0.35);
+}
+.cross::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+.cross::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+}
+
+/* mint status dot inline with a label */
+.mintdot {
+  display: inline-block;
+  width: 0.5cqw;
+  height: 0.5cqw;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 0.6cqw var(--mint-glow);
+  vertical-align: 0.05em;
+  margin-right: 0.35cqw;
+}
+
+/* ---------------- persistent corner metadata ---------------- */
+
+.meta {
+  position: absolute;
+  z-index: 5;
+  font-size: clamp(8px, 0.86cqw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  animation: kf-fade 900ms var(--ease-smooth) both;
+  pointer-events: none;
+}
+.meta.tl {
+  top: 3.2cqh;
+  left: 2.4cqw;
+}
+.meta.tr {
+  top: 3.2cqh;
+  right: 2.4cqw;
+}
+.meta.bl {
+  bottom: 3.2cqh;
+  left: 2.4cqw;
+  color: var(--faint);
+}
+.meta.br {
+  bottom: 3.2cqh;
+  right: 2.4cqw;
+  color: var(--faint);
+}
+
+/* ---------------- chrome (hidden in ?record=1) ---------------- */
+
+.chrome {
+  position: absolute;
+  z-index: 6;
+  bottom: 3cqh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  animation: kf-fade 900ms var(--ease-smooth) 600ms both;
+}
+.prog {
+  display: flex;
+  align-items: center;
+  gap: 0.7cqw;
+}
+.prog i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(243, 237, 228, 0.22);
+  transition: background 300ms var(--ease-smooth),
+    transform 300ms var(--ease-smooth);
+}
+.prog i.on {
+  background: var(--mint);
+  transform: scale(1.3);
+}
+.replay {
+  font-family: var(--font-sans);
+  font-size: clamp(8px, 0.8cqw, 12px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: transparent;
+  border: 0;
+  padding: 0.5cqh 0.9cqw;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--hl-ink);
+  transition: color 200ms var(--ease-smooth);
+}
+.replay:hover {
+  color: var(--fg-soft);
+}
+
+/* ================= scene 0 — cold open ================= */
+
+.s0-line {
+  position: absolute;
+  left: 22cqw;
+  right: 22cqw;
+  top: 50%;
+  height: 1px;
+  background: var(--hl-ink);
+  transform-origin: center;
+}
+.s0-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.7cqw;
+  height: 0.7cqw;
+  margin: -0.35cqw 0 0 -0.35cqw;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 1.2cqw var(--mint-glow);
+}
+.s0-cap {
+  position: absolute;
+  left: 50%;
+  top: 55.5%;
+  transform: translateX(-50%);
+  color: var(--faint);
+}
+
+/* ================= scene 1 — hero word ================= */
+
+.s1-word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -54%);
+  font-size: 14.6cqw;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  line-height: 1;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.s1-cap {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  transform: translateX(-50%);
+}
+
+/* ================= scene 2 — kinetic value-prop ================= */
+
+.s2-tag {
+  position: absolute;
+  left: 15cqw;
+  top: 17cqh;
+}
+.s2-w {
+  position: absolute;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--fg-soft);
+  letter-spacing: -0.01em;
+}
+.s2-w1 {
+  left: 15cqw;
+  top: 24cqh;
+  font-size: 5cqw;
+  color: var(--fg);
+}
+.s2-w2 {
+  left: 36cqw;
+  top: 39cqh;
+  font-size: 8.6cqw;
+  font-weight: 650;
+  color: var(--mint);
+  letter-spacing: -0.015em;
+}
+.s2-w3 {
+  left: 17cqw;
+  top: 66cqh;
+  font-size: 4.2cqw;
+}
+.s2-w4 {
+  left: 64cqw;
+  top: 66cqh;
+  font-size: 4.2cqw;
+}
+
+.s2-c1 {
+  left: 17.8cqw;
+  top: 34cqh;
+  height: 12.5cqh;
+}
+.s2-c2 {
+  left: 17.8cqw;
+  top: 46.5cqh;
+  width: 18.4cqw;
+}
+.s2-c3 {
+  left: 55cqw;
+  top: 60cqh;
+  height: 9.5cqh;
+}
+.s2-c4 {
+  left: 44.5cqw;
+  top: 69.5cqh;
+  width: 10.5cqw;
+}
+.s2-c5 {
+  left: 55cqw;
+  top: 69.5cqh;
+  width: 8cqw;
+}
+.s2-j1 {
+  left: 17.8cqw;
+  top: 46.5cqh;
+}
+.s2-j2 {
+  left: 55cqw;
+  top: 69.5cqh;
+}
+.s2-coord {
+  left: 19cqw;
+  top: 48.5cqh;
+  position: absolute;
+  color: var(--faint);
+}
+
+/* ================= scene 3 — dot-field shield ================= */
+
+.s3-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.s3-cap {
+  position: absolute;
+  left: 50%;
+  top: 84cqh;
+  transform: translateX(-50%);
+  letter-spacing: 0.32em;
+  color: var(--fg-soft);
+}
+.s3-axis {
+  left: 27cqw;
+  top: 22cqh;
+  height: 50cqh;
+}
+.s3-t1 {
+  left: 26.4cqw;
+  top: 22cqh;
+}
+.s3-t2 {
+  left: 26.4cqw;
+  top: 47cqh;
+}
+.s3-t3 {
+  left: 26.4cqw;
+  top: 72cqh;
+}
+.s3-a1 {
+  position: absolute;
+  left: 23.2cqw;
+  top: 21cqh;
+  color: var(--faint);
+}
+.s3-a2 {
+  position: absolute;
+  left: 23.2cqw;
+  top: 46cqh;
+  color: var(--faint);
+}
+.s3-a3 {
+  position: absolute;
+  left: 23.9cqw;
+  top: 71cqh;
+  color: var(--faint);
+}
+.s3-x {
+  left: 64.5cqw;
+  top: 20cqh;
+}
+.s3-xl {
+  position: absolute;
+  left: 66.5cqw;
+  top: 19.6cqh;
+  color: var(--faint);
+}
+
+/* ================= scene 4 — avatar interlude ================= */
+
+.s4-tag {
+  position: absolute;
+  left: 15cqw;
+  top: 17cqh;
+}
+.s4-holder {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44cqw;
+  height: 82cqh;
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+  background: #000;
+}
+.s4-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+/* static radial vignette for edge feathering — never a mask */
+.s4-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    72% 68% at 50% 48%,
+    transparent 58%,
+    #000 96%
+  );
+}
+
+.s4-l1 {
+  left: 55.5cqw;
+  top: 25cqh;
+  width: 14.5cqw;
+}
+.s4-p1 {
+  left: 55.5cqw;
+  top: 25cqh;
+}
+.s4-a1 {
+  position: absolute;
+  left: 71cqw;
+  top: 23.7cqh;
+}
+.s4-l2 {
+  left: 60.5cqw;
+  top: 52cqh;
+  width: 10cqw;
+}
+.s4-p2 {
+  left: 60.5cqw;
+  top: 52cqh;
+}
+.s4-a2 {
+  position: absolute;
+  left: 71.5cqw;
+  top: 50.7cqh;
+  color: var(--fg-soft);
+}
+.s4-l3 {
+  left: 31cqw;
+  top: 66cqh;
+  width: 16cqw;
+}
+.s4-p3 {
+  left: 47cqw;
+  top: 66cqh;
+}
+.s4-a3 {
+  position: absolute;
+  right: 69.5cqw;
+  top: 64.7cqh;
+}
+
+/* ================= scene 5 — feature stack ================= */
+
+.s5-tag {
+  position: absolute;
+  left: 15cqw;
+  top: 17cqh;
+}
+.s5-rows {
+  position: absolute;
+  left: 24cqw;
+  right: 24cqw;
+  top: 30cqh;
+}
+.s5-row {
+  position: relative;
+  padding: 3.4cqh 0 3cqh;
+}
+.s5-line {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2cqw;
+}
+.s5-tick {
+  width: 1.1cqw;
+  height: 1.1cqw;
+  align-self: center;
+  flex: none;
+}
+.s5-tick polyline {
+  stroke: var(--mint);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.s5-line b {
+  font-size: 2.6cqw;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  line-height: 1.1;
+}
+.s5-desc {
+  font-size: 1.5cqw;
+  font-weight: 450;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+.s5-meta {
+  margin-left: auto;
+  color: var(--faint);
+}
+.s5-rule {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ================= scene 6 — number moment ================= */
+
+.s6-tag {
+  position: absolute;
+  left: 15cqw;
+  top: 17cqh;
+}
+.s6-over {
+  position: absolute;
+  left: 50%;
+  top: 31cqh;
+  transform: translateX(-50%);
+  color: var(--faint);
+}
+.s6-num {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  font-size: 12.4cqw;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--fg);
+}
+.s6-rule {
+  left: 41cqw;
+  width: 18cqw;
+  top: 66cqh;
+  transform-origin: center;
+}
+.s6-delta {
+  position: absolute;
+  left: 50%;
+  top: 69.5cqh;
+  transform: translateX(-50%);
+  color: var(--peach);
+}
+
+/* ================= scene 7 — close ================= */
+
+.corner {
+  position: absolute;
+  width: 3cqw;
+  height: 3cqw;
+  pointer-events: none;
+}
+.corner::before,
+.corner::after {
+  content: "";
+  position: absolute;
+  background: rgba(243, 237, 228, 0.28);
+}
+.corner::before {
+  width: 100%;
+  height: 1px;
+}
+.corner::after {
+  width: 1px;
+  height: 100%;
+}
+.c-tl {
+  left: 12cqw;
+  top: 14cqh;
+}
+.c-tl::before {
+  top: 0;
+  left: 0;
+}
+.c-tl::after {
+  top: 0;
+  left: 0;
+}
+.c-tr {
+  right: 12cqw;
+  top: 14cqh;
+}
+.c-tr::before {
+  top: 0;
+  right: 0;
+}
+.c-tr::after {
+  top: 0;
+  right: 0;
+}
+.c-bl {
+  left: 12cqw;
+  bottom: 14cqh;
+}
+.c-bl::before {
+  bottom: 0;
+  left: 0;
+}
+.c-bl::after {
+  bottom: 0;
+  left: 0;
+}
+.c-br {
+  right: 12cqw;
+  bottom: 14cqh;
+}
+.c-br::before {
+  bottom: 0;
+  right: 0;
+}
+.c-br::after {
+  bottom: 0;
+  right: 0;
+}
+
+.s7-dot {
+  position: absolute;
+  left: 50%;
+  top: 39cqh;
+  width: 0.6cqw;
+  height: 0.6cqw;
+  margin-left: -0.3cqw;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 1cqw var(--mint-glow);
+}
+.s7-word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -55%);
+  font-size: 6.6cqw;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em; /* optically recenters tracked type */
+  line-height: 1;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.s7-tag {
+  position: absolute;
+  left: 50%;
+  top: 60.5cqh;
+  transform: translateX(-50%);
+  color: var(--faint);
+}
+
+/* ---------------- reduced motion: gentle cross-fades only ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .a-rise,
+  .a-letter,
+  .a-pop {
+    animation-name: kf-fade !important;
+    animation-duration: 500ms !important;
+  }
+  .a-drawx,
+  .a-drawy {
+    animation: kf-fade 500ms var(--ease-smooth) both !important;
+    animation-delay: var(--d, 0ms) !important;
+  }
+  .a-settle {
+    animation: none !important;
+  }
+  .pulse {
+    animation-name: kf-fade !important;
+    animation-duration: 500ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .scene.out {
+    animation-duration: 300ms !important;
+  }
+}

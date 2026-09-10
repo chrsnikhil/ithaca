@@ -1,0 +1,2624 @@
+/* ============================================================
+   GUARDIAN — FLIGHT DECK · engineered instrument-panel system
+   STARK MONOCHROME: pure-black canvas, white/near-white type,
+   mid-gray surfaces, hairline 1px borders, sharp corners.
+   NO chromatic accent anywhere — hierarchy comes from weight,
+   opacity, fill and hairline borders (ElevenLabs-minimal).
+   Severity (calm/elevated/danger) reads as opacity → fill →
+   inverted white-on-black, never as hue.
+   Type: Inter (ElevenLabs' UI face — their display Waldenburg
+   is proprietary) everywhere, weight-driven; Geist Mono for
+   technical micro-badges. Three flat elevations: black stage →
+   sheet → dock/cards. The clay avatar videos are the only
+   "material" color — everything around them is grayscale.
+   ============================================================ */
+
+/* ---- Tailwind v4, WITHOUT preflight ----
+   We import only the theme + utilities layers (this is the v4
+   equivalent of `corePlugins: { preflight: false }`). Preflight
+   would restyle button/video/img/svg defaults and risk regressing
+   the hand-built .gx- and .fl- prefixed flight-deck system and the
+   mix-blend-mode avatar stage — and our own `*` reset below
+   already covers margins/padding/box-sizing. All flight-deck CSS
+   stays UNLAYERED, so it also outranks every @layer rule. */
+/* (shadcn CLI v4-detection marker — do not remove: @import "tailwindcss") */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+
+/* the app is permanently dark — html carries class="dark" so registry
+   components' dark: utilities resolve against the flight-deck palette */
+@custom-variant dark (&:is(.dark *));
+
+/* map shadcn/Tailwind color tokens onto the flight-deck palette so
+   registry components (ElevenLabs UI) render in the existing look */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--card-2);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: #1a1a1a;
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: #1a1a1a;
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #0a0a0a;
+  --color-border: var(--border);
+  --color-input: var(--border-strong);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-inter, "Inter"), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, monospace;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+}
+
+:root {
+  /* ---- shadcn-style tokens (all grayscale) ---- */
+  --background: #000000;
+  --card: #0e0e0e;
+  --card-2: #131313;
+  --popover: #0e0e0e;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --foreground: #fafafa;
+  --muted-foreground: #a3a3a3;
+  --primary: #fafafa;
+  --primary-hover: #ffffff;
+  --primary-foreground: #0a0a0a;
+  --ring: #fafafa;
+
+  /* ---- legacy aliases (zen / dial / flow components read these) ---- */
+  --bg: var(--background);
+  --surface: var(--card);
+  --surface-2: var(--card-2);
+  --surface-3: #1a1a1a;
+  --stage: #000000; /* the avatar pool — pure black, always */
+  --dock: #171717; /* third elevation: stage (#000) → sheet (--card) → dock/cards */
+  --scrim: rgba(0, 0, 0, 0.62);
+
+  --fg: var(--foreground);
+  --fg-soft: #d6d6d6;
+  --muted: var(--muted-foreground);
+  --faint: #737373;
+  --hairline: var(--border);
+
+  /* ---- brand "accent" = white. --mint kept as an alias so every
+     accent site flattens to monochrome for free ---- */
+  --mint: #fafafa;
+  --mint-deep: #d4d4d4;
+  --mint-ink: #0a0a0a;
+  --mint-glow: rgba(255, 255, 255, 0.22);
+  --peach: #a3a3a3; /* neutralized */
+  --clay: #a3a3a3;
+
+  /* ---- semantic — severity is weight/fill, not hue ---- */
+  --danger: #ffffff;
+  --danger-soft: #ffffff;
+  --danger-ink: #0a0a0a;
+  --warn: #d4d4d4;
+
+  /* ---- radii (machined: 6 / 8 / 10 / 12 — sharp, not soft) ---- */
+  --r-lg: 12px;
+  --r-md: 10px;
+  --r-sm: 8px;
+  --r-xs: 6px;
+  --r-full: 999px; /* reserved: mic, status LEDs, progress track */
+
+  /* ---- flat "shadow" recipes: hairline rings, no clay depth ----
+     kept under their old names so shared components flatten for free */
+  --sheen: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --shadow-rest: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 16px 48px -16px rgba(0, 0, 0, 0.65),
+    0 4px 16px -8px rgba(0, 0, 0, 0.5);
+  --clay-pop: 0 0 0 0 transparent;
+  --clay-pop-soft: inset 0 0 0 1px var(--border);
+  --clay-well: inset 0 0 0 1px var(--border);
+
+  /* ---- type: Inter app-wide (weight-driven hierarchy) ---- */
+  --font-sans: var(--font-inter, "Inter"), "SF Pro Text", system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  /* tracked-caps scale for the display face */
+  --track: 0.08em;
+  --track-wide: 0.14em;
+  --track-brand: 0.26em;
+
+  /* ---- motion: precise + snappy, one family of eases ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-squish: cubic-bezier(0.3, 1.16, 0.5, 1); /* tamed — barely a bounce */
+  --ease-smooth: var(--ease);
+  --t-press: 90ms;
+  --t-quick: 140ms;
+  --t-soft: 220ms;
+  --t-reveal: 360ms;
+  --t-xfade: 300ms; /* avatar crossfade — JS cleanup expects ≤420ms */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body {
+  overflow-x: hidden;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+/* minimal form-control normalization — the one slice of Tailwind preflight the
+   registry components rely on (CommandInput etc. expect a bare, transparent
+   input and draw their own chrome). Pages that style inputs inline are unaffected. */
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+::selection {
+  background: var(--mint);
+  color: var(--mint-ink);
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+}
+/* the zen column (legacy page) */
+.zen {
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  margin: 0 auto;
+  padding: max(env(safe-area-inset-top), 22px) 22px
+    calc(max(env(safe-area-inset-bottom), 8px) + 2px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- entrance choreography ---------- */
+.reveal {
+  animation: reveal-up var(--t-reveal) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* instrument numerals: tabular + slashed zero, everywhere figures live */
+.tnum,
+.zen-bal,
+.gx-bal,
+.fl-amount,
+.gx-stat .v,
+.fl-row .v,
+.gx-fitem .amt,
+.gx-strip .when {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* ============================================================
+   LEGACY ZEN PAGE (Guardian.tsx) — flattened to match
+   ============================================================ */
+.zen-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 6px;
+  min-height: 24px;
+}
+.zen-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--fg-soft);
+}
+.zen-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mint);
+  animation: dot-breathe 2.8s var(--ease-smooth) infinite;
+  flex: none;
+}
+.zen-bal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.zen-bal em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--faint);
+  letter-spacing: 0.05em;
+}
+.swap-in {
+  display: inline-block;
+  animation: swap-in var(--t-quick) var(--ease-out) both;
+}
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dot-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.zen-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 54dvh;
+  margin-top: auto;
+  border: 0;
+  border-radius: var(--r-lg);
+  background: transparent;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+  transition: transform var(--t-press) var(--ease);
+  will-change: transform;
+}
+.zen-stage:active {
+  transform: scale(0.985);
+}
+.stage-ambient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    50% 36% at 50% 47%,
+    color-mix(in srgb, var(--sac, #ffffff) 7%, transparent),
+    transparent 70%
+  );
+  animation: fade-in 0.6s var(--ease-smooth) both,
+    amb-breathe 6s ease-in-out 0.6s infinite alternate;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+@keyframes amb-breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+.avatar-holder {
+  position: absolute;
+  inset: 0;
+}
+.avatar-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translateZ(0) scale(1.155);
+  transition: opacity 0.4s var(--ease-smooth), transform 0.85s var(--ease-out);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+.avatar-holder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(78% 74% at 50% 46%, transparent 62%, #000000 99%);
+}
+.avatar-video.on {
+  opacity: 1;
+  transform: translateZ(0) scale(1.12);
+}
+.zen-status {
+  display: flex;
+  justify-content: center;
+  padding: 2px 16px 6px;
+  min-height: 30px;
+  margin-bottom: auto;
+}
+.zen-voice {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  text-align: center;
+  animation: voice-in 0.24s var(--ease-out) both;
+}
+@keyframes voice-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.zen-voice .si {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sac, var(--mint));
+  flex: none;
+}
+
+.zen-grip {
+  align-self: center;
+  border: 0;
+  background: transparent;
+  padding: 12px 30px 10px;
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: transform var(--t-press) var(--ease);
+}
+.zen-grip:active {
+  transform: translateY(1px) scale(0.95);
+}
+.zen-grip > span {
+  display: block;
+  width: 44px;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.14);
+  transition: background var(--t-quick) var(--ease);
+}
+.zen-grip:hover > span {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.block > .label,
+.block-head > .label {
+  padding-left: 4px;
+}
+.block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.btn-ghost {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: var(--r-xs);
+  transition: color var(--t-quick) var(--ease), background var(--t-quick) var(--ease),
+    border-color var(--t-quick) var(--ease);
+}
+.btn-ghost:hover {
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+.btn-ghost:active {
+  background: rgba(255, 255, 255, 0.07);
+}
+.btn-ghost.on {
+  color: var(--fg);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* state picker track */
+.states {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.states::-webkit-scrollbar {
+  display: none;
+}
+.seg {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 2px 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-xs);
+  transition: background var(--t-quick) var(--ease), color var(--t-quick) var(--ease);
+}
+.seg:hover {
+  color: var(--fg-soft);
+}
+.seg:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.seg.active {
+  background: var(--surface-3);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.seg.hot.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.seg.hot.active svg {
+  stroke: var(--danger);
+}
+.seg svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.seg.active svg {
+  stroke: var(--mint);
+  animation: icon-pop 0.25s var(--ease-out);
+}
+@keyframes icon-pop {
+  from {
+    transform: scale(0.7);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* character trigger tile */
+.char-tile {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  color: var(--fg);
+  text-align: left;
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease);
+}
+.char-tile:hover {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+.char-thumb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--stage);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.char-thumb img {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  object-position: 50% 22%;
+}
+.char-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.char-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.char-meta b {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: -0.01em;
+}
+.char-meta > span {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 15px;
+}
+.char-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: var(--r-xs);
+  box-shadow: inset 0 0 0 1px var(--border);
+  flex: 0 0 auto;
+  transition: color var(--t-quick) var(--ease);
+}
+.char-tile:hover .char-change {
+  color: var(--fg);
+}
+.char-change svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ===================== rotary character dial (legacy pop-up) ===================== */
+.dial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--scrim);
+  animation: fl-fade 0.22s var(--ease) both;
+}
+.dial-overlay.closing {
+  animation: dial-fade-out 0.18s var(--ease) both;
+  pointer-events: none;
+}
+@keyframes dial-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.dial-pop {
+  width: 100%;
+  max-width: 372px;
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px 18px;
+  box-shadow: var(--shadow-float);
+  animation: dial-pop-in 0.28s var(--ease-out) both;
+  will-change: transform;
+}
+@keyframes dial-pop-in {
+  from {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+.closing .dial-pop {
+  animation: dial-pop-out 0.18s var(--ease) both;
+}
+@keyframes dial-pop-out {
+  to {
+    transform: scale(0.97) translateY(8px);
+    opacity: 0;
+  }
+}
+.dial-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 0 4px;
+}
+.dial-x {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  transition: color var(--t-quick) var(--ease), background var(--t-quick) var(--ease);
+}
+.dial-x:hover {
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+.dial-x svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.dial-wrap {
+  position: relative;
+  width: 296px;
+  margin: 22px auto 4px;
+}
+.dial-pointer {
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  transform: translateX(-50%);
+  width: 22px;
+  z-index: 6;
+  color: var(--mint);
+  pointer-events: none;
+}
+.dial-pointer svg {
+  display: block;
+  width: 100%;
+}
+.dial-face {
+  position: relative;
+  width: 296px;
+  height: 296px;
+  border-radius: 50%;
+  background: var(--card-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.dial-face.dragging {
+  cursor: grabbing;
+}
+.dial-groove {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 212px;
+  height: 212px;
+  margin: -106px 0 0 -106px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--border);
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.dial-rotor {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.45s var(--ease-out);
+  will-change: transform;
+}
+.dragging .dial-rotor,
+.dragging .dial-av {
+  transition: none;
+}
+.dial-slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--a)) translateY(-106px);
+}
+.dial-av {
+  position: absolute;
+  left: -31px;
+  top: -31px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: block;
+  transform: rotate(calc((var(--a) + var(--rot, 0deg)) * -1)) scale(1);
+  transition: transform 0.45s var(--ease-out);
+  will-change: transform;
+  cursor: pointer;
+}
+.dial-avc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--stage);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+  display: block;
+}
+.dial-avc img {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  opacity: 0.5;
+  transition: opacity var(--t-quick) var(--ease);
+  pointer-events: none;
+}
+.dial-av::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 16px var(--mint-glow);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.dial-av::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--mint);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.dial-av.focus {
+  transform: rotate(calc((var(--a) + var(--rot, 0deg)) * -1)) scale(1.26);
+  z-index: 2;
+}
+.dial-av.focus .dial-avc img {
+  opacity: 1;
+}
+.dial-av.focus::before,
+.dial-av.focus::after {
+  opacity: 1;
+}
+.dial-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 126px;
+  height: 126px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--surface-3);
+  box-shadow: inset 0 0 0 1px var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-align: center;
+  padding: 12px;
+  pointer-events: none;
+  z-index: 3;
+}
+.dial-hub b {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 20px;
+}
+.dial-hub span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 14px;
+}
+
+.dial-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.dial-chev {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--fg-soft);
+  display: grid;
+  place-items: center;
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease);
+}
+.dial-chev:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-strong);
+}
+.dial-chev svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dial-select {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border: 0;
+  border-radius: var(--r-sm);
+  transition: background var(--t-quick) var(--ease), transform var(--t-press) var(--ease);
+}
+.dial-select:hover {
+  background: var(--primary-hover);
+}
+.dial-select:active {
+  transform: scale(0.985);
+}
+
+/* ===================== controls sheet (legacy) ===================== */
+.fl-overlay.ctrl {
+  background: rgba(0, 0, 0, 0.55);
+}
+.ctrl-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ctrl-sheet .fl-handle {
+  margin-bottom: 0;
+}
+.sheet-foot {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-top: 2px;
+}
+
+/* quick-action tiles (legacy) */
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  color: var(--fg);
+  text-align: left;
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease);
+}
+.tile:hover {
+  background: var(--surface-3);
+  border-color: var(--border-strong);
+}
+.tile-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-xs);
+  background: transparent;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.tile-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tile:hover .tile-icon svg {
+  stroke: var(--fg-soft);
+}
+.tile b {
+  font-size: 13.5px;
+  font-weight: 600;
+  display: block;
+  line-height: 18px;
+  letter-spacing: -0.01em;
+}
+.tile span {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 15px;
+}
+
+/* ===================== bottom sheets ===================== */
+.fl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--scrim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fl-fade 0.22s var(--ease) both;
+}
+@keyframes fl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fl-sheet {
+  width: 100%;
+  max-width: 468px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 8px 20px calc(env(safe-area-inset-bottom, 16px) + 22px);
+  box-shadow: var(--shadow-float);
+  animation: sheet-up 0.3s var(--ease-out) both;
+  will-change: transform;
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(16%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+/* smooth close: the shell keeps the sheet mounted ~260ms with .closing */
+.fl-overlay.closing {
+  animation: overlay-out 0.22s var(--ease) both;
+  pointer-events: none;
+}
+.fl-overlay.closing .fl-sheet {
+  animation: sheet-down 0.22s var(--ease) both;
+}
+@keyframes overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes sheet-down {
+  to {
+    transform: translateY(10%);
+    opacity: 0;
+  }
+}
+.fl-handle {
+  width: 32px;
+  height: 3px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 8px auto 18px;
+}
+.fl-phase {
+  animation: phase-in 0.32s var(--ease-out) both;
+}
+@keyframes phase-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fl-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 200px;
+}
+.fl-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 6px;
+}
+.fl-sub {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 6px;
+  padding: 0 10px;
+}
+.fl-amount {
+  text-align: center;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.fl-rows {
+  margin-top: 14px;
+}
+.fl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.fl-row:last-child {
+  border-bottom: 0;
+}
+.fl-row .k {
+  color: var(--muted);
+  font-weight: 400;
+}
+.fl-row .v {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.fl-row .v.mint {
+  color: var(--mint);
+}
+
+/* sheet buttons: one solid primary, quiet = outline ghost */
+.fl-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border: 0;
+  border-radius: var(--r-xs);
+  transition: background var(--t-quick) var(--ease), transform var(--t-press) var(--ease);
+}
+.fl-btn:hover {
+  background: var(--primary-hover);
+}
+.fl-btn:active {
+  transform: scale(0.985);
+}
+.fl-btn.quiet {
+  margin-top: 10px;
+  padding: 13px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.fl-btn.quiet:hover {
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Face ID flow (legacy) ---------- */
+.fid-well {
+  position: relative;
+  width: 184px;
+  height: 184px;
+  border-radius: var(--r-lg);
+  background: var(--stage);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.fid-well::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 46% at 50% 40%,
+    rgba(255, 255, 255, 0.07),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.fid-mark {
+  width: 116px;
+  height: 116px;
+}
+.fid-scanning .fid-mark {
+  animation: face-pulse 1.15s ease-in-out infinite alternate;
+}
+@keyframes face-pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+.fid-scan {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 18%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--mint) 30%,
+    var(--mint) 70%,
+    transparent
+  );
+  animation: scan-move 1.15s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes scan-move {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(118px);
+  }
+}
+
+.fl-prog {
+  height: 8px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-top: 18px;
+}
+.fl-prog > i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--r-full);
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: fl-fill 2.1s var(--ease) forwards;
+  will-change: transform;
+}
+.fl-prog.pay > i {
+  animation-duration: 1.5s;
+}
+@keyframes fl-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- coins (legacy pay flow) ---------- */
+.fl-coin {
+  width: 124px;
+  height: 124px;
+}
+.fl-spin {
+  animation: coin-spin 1.1s linear infinite;
+}
+@keyframes coin-spin {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+.fl-fly {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+@keyframes fl-flyup {
+  0% {
+    transform: translate(0, 0) scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fx, 0px), -150px) scale(1.1)
+      rotate(var(--fr, 12deg));
+    opacity: 0;
+  }
+}
+
+/* ---------- success (legacy) ---------- */
+.fl-check {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: grid;
+  place-items: center;
+}
+.fl-check svg {
+  width: 54px;
+  height: 54px;
+  stroke: var(--primary-foreground);
+  fill: none;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fl-check svg path {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  animation: check-draw 0.45s var(--ease) 0.18s forwards;
+}
+@keyframes check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.fl-pop {
+  animation: fl-pop 0.4s var(--ease-out) both;
+}
+@keyframes fl-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.fl-ring {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 130px;
+  height: 130px;
+  margin: -65px 0 0 -65px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--r-full);
+  opacity: 0;
+  animation: fl-ring 0.85s var(--ease-out) forwards;
+  pointer-events: none;
+}
+.fl-ring.c2 {
+  border-color: rgba(255, 255, 255, 0.25);
+  animation-delay: 0.14s;
+}
+@keyframes fl-ring {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+.fl-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.fl-confetti > i {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: var(--sz, 10px);
+  height: var(--sz, 10px);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+@keyframes fl-conf {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+    opacity: 1;
+  }
+  14% {
+    transform: translate(calc(var(--cx) * 0.3), calc(var(--cy) * 0.42))
+      rotate(calc(var(--cr) * 0.3)) scale(1.1);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--cx), calc(var(--cy) + 70px)) rotate(var(--cr))
+      scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   GUARDIAN SHELL (GX) — the voice-first control room,
+   restyled: flat black, hairline borders, one mint accent
+   ============================================================ */
+.gx {
+  width: 100%;
+  max-width: 468px;
+  height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  /* bottom padding clears the fixed pill dock + its raised mic */
+  padding: max(env(safe-area-inset-top), 14px) 20px
+    calc(max(env(safe-area-inset-bottom), 10px) + 88px);
+}
+
+/* ---------- top bar: quiet header with a hairline underline ---------- */
+.gx-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 2px 14px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 20;
+}
+.gx-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--track-brand);
+  text-transform: uppercase;
+  color: var(--fg);
+}
+/* status LED: square chip, instrument-panel style */
+.gx-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--faint);
+  flex: none;
+  transition: background var(--t-soft) var(--ease);
+}
+.gx-live.on {
+  background: var(--mint);
+  box-shadow: 0 0 8px var(--mint-glow);
+  animation: dot-breathe 2.8s var(--ease) infinite;
+}
+/* danger LED: same white chip, urgent fast blink — severity by tempo, not hue */
+.gx-live.danger {
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  animation: dot-breathe 0.6s var(--ease) infinite;
+}
+.gx-bal {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--fg);
+}
+.gx-bal em {
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+}
+/* ---------- stage: the clay avatar, hero on pure black ---------- */
+.gx-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.gx-orb {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+  transition: transform var(--t-press) var(--ease);
+}
+.gx-orb:active {
+  transform: scale(0.99);
+}
+/* pure-black pool that melts invisibly into the #09090b page */
+.gx-orb::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  background: radial-gradient(58% 58% at 50% 50%, #000 42%, rgba(0, 0, 0, 0) 76%);
+  pointer-events: none;
+}
+.gx-orb video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  transform: translateZ(0) scale(1.12);
+  backface-visibility: hidden;
+}
+.gx-orb .feather {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(78% 74% at 50% 46%, transparent 62%, #000 99%);
+}
+
+/* ---------- avatar crossfade layers ----------
+   Two stacked <video class="gx-av"> elements. The incoming clip mounts
+   as .pre (invisible, decoding), then .in fades it up over ~300ms while
+   the outgoing layer gets .out and fades away — never a remount flash. */
+.gx-av {
+  opacity: 1;
+}
+.gx-av.pre {
+  opacity: 0;
+}
+.gx-av.in {
+  animation: av-in var(--t-xfade) var(--ease) both;
+}
+.gx-av.out {
+  animation: av-out var(--t-xfade) var(--ease) both;
+}
+@keyframes av-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes av-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- last-exchange peek: fixed-height slot beneath the avatar ---------- */
+.gx-peek {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 86px;
+  padding: 4px 16px 2px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity var(--t-quick) var(--ease);
+}
+.gx-peek:active {
+  opacity: 0.75;
+}
+.gx-peek .g {
+  font-size: 15px;
+  line-height: 1.42;
+  font-weight: 450;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  margin: 0;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+  animation: voice-in 0.22s var(--ease-out) both;
+}
+.gx-peek .g.one {
+  -webkit-line-clamp: 1;
+}
+.gx-peek .u {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  animation: voice-in 0.22s var(--ease-out) both;
+}
+.gx-peek .ph {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+/* ---------- captions: the FULL transcript, now inside a sheet ---------- */
+.gx-caption {
+  height: 20vh;
+  max-height: 190px;
+  min-height: 84px;
+  overflow-y: auto;
+  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 10px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 10px), transparent 100%);
+}
+.gx-caption::-webkit-scrollbar {
+  width: 5px;
+}
+.gx-caption::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+.gx-caption .g {
+  font-size: 15.5px;
+  line-height: 1.45;
+  font-weight: 450;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  margin: 0;
+  text-align: left;
+  align-self: flex-start;
+  max-width: 94%;
+  text-wrap: pretty;
+  animation: voice-in 0.22s var(--ease-out) both;
+}
+.gx-caption .u {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+  text-align: right;
+  align-self: flex-end;
+  max-width: 88%;
+  animation: voice-in 0.22s var(--ease-out) both;
+}
+.gx-caption .ph {
+  align-self: center;
+  text-align: center;
+  margin: auto 0;
+}
+/* in-sheet variant: taller scroll well for the whole conversation */
+.gx-caption.full {
+  height: auto;
+  max-height: 58svh;
+  min-height: 180px;
+  margin-top: 12px;
+  padding: 8px 4px 4px;
+}
+
+/* ---------- live feed strip: fixed-height slot, flat card ---------- */
+.gx-striprow {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  margin: 2px 0 10px;
+}
+.gx-strip {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card);
+  cursor: pointer;
+  animation: fade-in var(--t-soft) var(--ease-out) both;
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease);
+}
+.gx-strip:hover {
+  background: var(--card-2);
+  border-color: var(--border-strong);
+}
+.gx-strip .rail {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  flex: none;
+}
+.gx-strip .txt {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--fg-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gx-strip .txt b {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+}
+.gx-strip .when {
+  font-size: 10.5px;
+  color: var(--faint);
+  flex: none;
+}
+
+/* tier "colors" — a monochrome severity ramp: calm is quiet gray,
+   elevated steps up in opacity, danger is full white + heavy weight */
+.t-CALM { color: rgba(255, 255, 255, 0.55); } .b-CALM { background: rgba(255, 255, 255, 0.4); }
+.t-ELEVATED { color: rgba(255, 255, 255, 0.85); } .b-ELEVATED { background: rgba(255, 255, 255, 0.75); }
+.t-DANGER { color: #ffffff; font-weight: 800; } .b-DANGER { background: #ffffff; box-shadow: 0 0 6px rgba(255, 255, 255, 0.6); }
+.t-CONTROL, .t-SETUP { color: var(--muted); } .b-CONTROL, .b-SETUP { background: var(--muted); }
+.t-ERROR { color: #ffffff; font-weight: 800; } .b-ERROR { background: #ffffff; }
+
+/* ---------- status hint (peek + sheets): uppercase readout ---------- */
+.gx-hint {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+  min-height: 16px;
+}
+
+/* ---------- floating dock: machined slab, 4 destinations flanking the raised mic ---------- */
+.gx-dock {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  margin: 0 auto;
+  max-width: 424px;
+  height: 56px;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: 1fr 1fr 82px 1fr 1fr;
+  align-items: stretch;
+  padding: 0 6px;
+  background: var(--dock);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-float);
+}
+.gx-ditem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  transition: color var(--t-quick) var(--ease), transform var(--t-press) var(--ease);
+}
+.gx-ditem:hover {
+  color: var(--fg-soft);
+}
+.gx-ditem:active {
+  transform: scale(0.93);
+}
+.gx-ditem.active {
+  color: var(--fg);
+}
+.gx-ditem svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+.gx-ditem span {
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* raised center mic — breaks the pill's top edge */
+.gx-dockmic {
+  position: relative;
+}
+/* the one circular exception — but with a machined keyline ring:
+   solid mint puck, 4px black gap, 1px hairline bezel */
+.gx-mic {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 0;
+  display: grid;
+  place-items: center;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  box-shadow: 0 0 0 4px #000000, 0 0 0 5px var(--border-strong),
+    0 14px 30px -14px var(--mint-glow);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform var(--t-press) var(--ease), color var(--t-quick) var(--ease),
+    background var(--t-quick) var(--ease), box-shadow var(--t-soft) var(--ease);
+}
+.gx-dock .gx-mic {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  margin-left: -34px;
+}
+.gx-mic:hover {
+  background: var(--primary-hover);
+}
+.gx-mic:active {
+  transform: scale(0.95);
+}
+/* live = capturing: the puck INVERTS (black face, white icon) with a white ring pulse —
+   monochrome severity: inversion + motion instead of a hue flip */
+.gx-mic.holding {
+  color: #ffffff;
+  background: #0a0a0a;
+  transform: scale(1.03);
+  box-shadow: 0 0 0 4px #000000, 0 0 0 5px rgba(255, 255, 255, 0.55),
+    0 0 0 12px rgba(255, 255, 255, 0.08);
+  animation: mic-pulse 1.3s var(--ease) infinite;
+}
+@keyframes mic-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px #000000, 0 0 0 5px rgba(255, 255, 255, 0.55),
+      0 0 0 11px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 4px #000000, 0 0 0 5px rgba(255, 255, 255, 0.9),
+      0 0 0 17px rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ---------- GX sheet scope: shadcn dialog typography ---------- */
+/* cap the sheet so the avatar glow stays visible behind it */
+.fl-sheet.gx-sheet {
+  max-height: 85svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.fl-sheet.gx-sheet::-webkit-scrollbar {
+  display: none;
+}
+
+/* Portfolio sheet: segmented control swapping Balances / Positions / Investments */
+.gx-segbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  margin-top: 2px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.gx-segbtn {
+  padding: 10px 4px;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-xs);
+  transition: background var(--t-quick) var(--ease), color var(--t-quick) var(--ease);
+}
+.gx-segbtn:hover {
+  color: var(--fg-soft);
+}
+.gx-segbtn.active {
+  background: var(--surface-3);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+/* the segbar is the header here — the panel body's own title would repeat it */
+.gx-segbar ~ .fl-title,
+.gx-sheet .gx-segbar ~ .fl-title {
+  display: none;
+}
+
+/* section titles: uppercase spec-sheet headers with a mint index tick */
+.gx-sheet .fl-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--fg);
+  margin-top: 4px;
+}
+.gx-sheet .fl-title::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  background: var(--mint);
+  flex: none;
+}
+.gx-sheet .fl-sub {
+  text-align: left;
+  font-size: 13px;
+  padding: 0;
+  margin-top: 6px;
+}
+.gx-sheet .fl-rows {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.gx-sheet .fl-row {
+  padding: 12px 14px;
+  font-size: 13.5px;
+}
+.gx-sheet .fl-row:last-child {
+  border-bottom: 0;
+}
+/* spec-sheet keys: quiet uppercase micro-labels against tabular values */
+.gx-sheet .fl-row .k {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gx-sheet .fl-row .v {
+  font-weight: 600;
+}
+
+/* ---------- stat cards: bordered, flat, generous ---------- */
+.gx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.gx-stat {
+  padding: 14px;
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  animation: fade-in var(--t-soft) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.gx-stat .k {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gx-stat .v {
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-top: 7px;
+}
+.gx-stat .v em {
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-left: 5px;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+}
+.gx-stat.hero {
+  grid-column: 1 / -1;
+  border-left: 2px solid var(--mint);
+}
+.gx-stat.hero .v {
+  font-size: 36px;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.gx-stat.mint .v {
+  color: var(--mint);
+}
+.gx-grid > .gx-stat:nth-child(2) { --d: 40ms; }
+.gx-grid > .gx-stat:nth-child(3) { --d: 80ms; }
+.gx-grid > .gx-stat:nth-child(4) { --d: 120ms; }
+.gx-grid > .gx-stat:nth-child(5) { --d: 160ms; }
+
+/* ---------- action buttons: one solid primary + outline secondaries ---------- */
+.gx-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.gx-act {
+  flex: 1;
+  padding: 13px 14px;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-xs);
+  background: transparent;
+  color: var(--fg);
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease),
+    transform var(--t-press) var(--ease), opacity var(--t-quick) var(--ease),
+    color var(--t-quick) var(--ease);
+}
+.gx-act:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.gx-act:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.gx-act.mint {
+  background: var(--primary);
+  border-color: transparent;
+  color: var(--primary-foreground);
+}
+.gx-act.mint:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+/* danger action: heavier white outline (severity via border weight, not hue);
+   hover inverts to solid white */
+.gx-act.danger {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+.gx-act.danger:hover:not(:disabled) {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--fg);
+}
+.gx-act:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- feed list: flat bordered rows ---------- */
+.gx-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  max-height: 52dvh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.gx-feed::-webkit-scrollbar {
+  display: none;
+}
+.gx-fitem {
+  display: flex;
+  gap: 11px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  animation: fade-in var(--t-soft) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.gx-feed > .gx-fitem:nth-child(2) { --d: 40ms; }
+.gx-feed > .gx-fitem:nth-child(3) { --d: 80ms; }
+.gx-feed > .gx-fitem:nth-child(4) { --d: 120ms; }
+.gx-feed > .gx-fitem:nth-child(5) { --d: 160ms; }
+.gx-fitem .rail {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  margin-top: 5px;
+  flex: none;
+}
+.gx-fitem .body {
+  flex: 1;
+  min-width: 0;
+}
+.gx-fitem .top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gx-fitem .tag {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.gx-fitem .amt {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+.gx-fitem .reason {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.45;
+}
+.gx-fitem a {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  color: var(--mint);
+  text-decoration: none;
+}
+.gx-fitem a:hover {
+  text-decoration: underline;
+}
+.gx-empty {
+  text-align: center;
+  color: var(--faint);
+  font-size: 13px;
+  padding: 26px 0;
+}
+
+/* ---------- danger toggle: shadcn switch ---------- */
+.gx-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  margin-top: 16px;
+}
+.gx-toggle .tl b {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+}
+.gx-toggle .tl span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+/* squared rocker switch — instrument panel, not pill */
+.gx-sw {
+  width: 44px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.08);
+  position: relative;
+  flex: none;
+  transition: background var(--t-quick) var(--ease), border-color var(--t-quick) var(--ease);
+}
+/* ON = full-white fill with a black knob — inverted, unmistakable, still mono */
+.gx-sw.on {
+  background: #ffffff;
+  border-color: transparent;
+}
+.gx-sw i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: #fafafa;
+  transition: transform var(--t-quick) var(--ease), background var(--t-quick) var(--ease);
+}
+.gx-sw.on i {
+  transform: translateX(20px);
+  background: #0a0a0a;
+}
+.gx-note {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ---------- character picker sheet ---------- */
+.gx-charrow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+}
+.gx-charopt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 2px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  animation: fade-in var(--t-soft) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+  transition: background var(--t-quick) var(--ease), color var(--t-quick) var(--ease),
+    border-color var(--t-quick) var(--ease);
+}
+.gx-charopt:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg-soft);
+}
+.gx-charopt:active {
+  background: rgba(255, 255, 255, 0.07);
+}
+.gx-charopt.sel {
+  color: var(--fg);
+  border-color: var(--border);
+  background: var(--card-2);
+}
+.gx-charwell {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--stage);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.gx-charwell video {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  object-position: 50% 24%;
+  pointer-events: none;
+}
+/* mint ring on the selected well (opacity fade only) */
+.gx-charwell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--mint);
+  opacity: 0;
+  transition: opacity var(--t-quick) var(--ease);
+  pointer-events: none;
+}
+.gx-charopt.sel .gx-charwell::after {
+  opacity: 1;
+}
+.gx-charopt b {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 15px;
+}
+.gx-charrole {
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  line-height: 12px;
+  transition: color var(--t-quick) var(--ease);
+}
+.gx-charopt.sel .gx-charrole {
+  color: var(--mint);
+}
+
+/* ---------- top-bar character chip (opens the picker sheet) ---------- */
+.gx-me {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--stage);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  flex: none;
+  transition: border-color var(--t-quick) var(--ease), transform var(--t-press) var(--ease);
+}
+.gx-me video {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  object-position: 50% 24%;
+  pointer-events: none;
+}
+.gx-me:hover,
+.gx-me.active {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+.gx-me:active {
+  transform: scale(0.94);
+}
+
+/* ---------- Orb character: the ElevenLabs orb AS the hero ----------
+   Replaces the clay CrossfadeVideo inside .gx-orb when char === "orb".
+   The canvas fills the square stage; the existing ::before black pool
+   still feathers it into the page. */
+.gx-heroorb {
+  position: absolute;
+  inset: 2.5%;
+  animation: fade-in var(--t-reveal) var(--ease-out) both;
+}
+/* small orb inside the top-bar chip / Me-sheet well (circular, clipped) */
+.gx-chiporb {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- orb accent beside the status readout (peek) ---------- */
+.gx-hintrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+.gx-orbwell {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+.gx-orbdot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  opacity: 0.8;
+}
+
+/* ---------- ElevenLabs conversation transcript (sheet) ---------- */
+.gx-convo {
+  height: 52svh;
+  min-height: 220px;
+  margin-top: 10px;
+}
+.gx-msg {
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+/* current-character preview + voice-picker row (Me sheet) */
+.gx-mepick {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+.gx-charwell.big {
+  width: 72px;
+  height: 72px;
+}
+.gx-mepick-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gx-mepick-body .gx-charrole {
+  padding-left: 2px;
+}
+
+/* ---------- markets: graphscout-ranked venue cards ---------- */
+.gx-mkt {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card-2);
+  animation: fade-in var(--t-soft) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.gx-mkt.pick {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+}
+.gx-mkt .row1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.gx-mkt .name {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: var(--track);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gx-mkt .apr {
+  margin-left: auto;
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  color: var(--fg);
+  flex: none;
+}
+.gx-mkt.pick .apr {
+  color: var(--mint);
+}
+.gx-mkt .apr em {
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: var(--track);
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+.gx-mkt .pickstar {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--mint-ink);
+  background: var(--mint);
+  border-radius: 3px;
+  padding: 2.5px 6px;
+  flex: none;
+}
+.gx-mkt .row2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+.gx-mkt .row2 .pos {
+  color: var(--fg-soft);
+}
+.gx-mkt .row2 .neg {
+  color: var(--fg);
+  font-weight: 600;
+}
+.gx-mkt .row2 .inpos {
+  margin-left: auto;
+  color: var(--mint);
+  font-weight: 600;
+}
+
+/* ============================================================
+   REDUCED MOTION — everything settles instantly, nothing loops
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .avatar-video {
+    /* near-zero duration keeps the transitionend cleanup firing */
+    transition-duration: 0.01ms;
+  }
+  .gx-av.in,
+  .gx-av.out,
+  .reveal,
+  .zen-voice,
+  .swap-in,
+  .fl-phase,
+  .fl-sheet,
+  .fl-overlay,
+  .fl-overlay.closing,
+  .fl-overlay.closing .fl-sheet,
+  .fl-pop,
+  .fl-ring,
+  .fl-check svg path,
+  .seg.active svg,
+  .dial-overlay,
+  .dial-pop,
+  .gx-strip,
+  .gx-charopt,
+  .gx-stat,
+  .gx-fitem,
+  .gx-mkt,
+  .gx-caption .g,
+  .gx-peek .g,
+  .gx-peek .u {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+  .zen-dot,
+  .stage-ambient,
+  .fid-scan,
+  .fid-scanning .fid-mark,
+  .fl-spin,
+  .fl-fly,
+  .fl-confetti > i,
+  .gx-live.on,
+  .gx-live.danger,
+  .gx-mic.holding {
+    animation: none !important;
+  }
+  .seg,
+  .btn-ghost,
+  .tile,
+  .tile-icon svg,
+  .fl-btn,
+  .char-tile,
+  .char-change,
+  .zen-stage,
+  .zen-grip,
+  .zen-grip > span,
+  .dial-x,
+  .dial-chev,
+  .dial-select,
+  .dial-rotor,
+  .dial-av,
+  .dial-avc img,
+  .dial-av::before,
+  .dial-av::after,
+  .gx-orb,
+  .gx-mic,
+  .gx-act,
+  .gx-strip,
+  .gx-sw,
+  .gx-sw i,
+  .gx-charopt,
+  .gx-charwell::after,
+  .gx-charrole,
+  .gx-ditem,
+  .gx-peek,
+  .gx-segbtn,
+  .gx-me,
+  .gx-live {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

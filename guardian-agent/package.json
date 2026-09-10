@@ -1,0 +1,16 @@
+{
+  "name": "guardian-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Guardian SEE+THINK layer — risk-watcher (The Graph) + rescue trigger",
+  "scripts": {
+    "test": "node --test",
+    "watch": "node watch.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.17.0"
+  }
+}

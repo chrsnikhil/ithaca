@@ -1,0 +1,70 @@
+{
+  "arcTestnet": {
+    "chainId": 5042002,
+    "explorer": "https://testnet.arcscan.app",
+    "GuardVault": "0xfdF97Ad1E32820b0E58f3382Fe223101bd1f6eCb",
+    "MockUSDC": "0x0816CDbb3C1eC98F14432f0a738F101071f6eB0E",
+    "owner": "0x975Bb943F18fe44333eF28D18865ca5A5D63c23D",
+    "note": "MockYieldVenue stands in for USYC Teller (entitlement-gated) on testnet.",
+    "deployedAt": "2026-09-05",
+    "GuardianVault": "0xbEa47f1B7C1252EB2a7C758b27f28ea35ae6c193",
+    "usdc": "0x3600000000000000000000000000000000000000",
+    "venue": "0x7e2582E5Bef62Ad8c1EdD832E2b6AE6d5e0d2801",
+    "aToken": "0x7e2582E5Bef62Ad8c1EdD832E2b6AE6d5e0d2801",
+    "yieldAprBps": 500,
+    "guardianOwner": "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da",
+    "guardianAgent": "0x975Bb943F18fe44333eF28D18865ca5A5D63c23D",
+    "guardianHaven": "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da",
+    "rpc": "https://rpc.testnet.arc.network",
+    "GuardianVaultMulti": "0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808",
+    "markets": [
+      {
+        "key": "moonwell",
+        "apr": 800,
+        "venue": "0xE98eb72D66e282155A423F085A29e71d5c8fc015"
+      },
+      {
+        "key": "aave",
+        "apr": 500,
+        "venue": "0x6dB0bA243F5e9713634B5D0706C7b28f83438Afb"
+      },
+      {
+        "key": "compound",
+        "apr": 600,
+        "venue": "0x37Ac7B5b8a0a045496936A82D2c78dDFF125ca6E"
+      }
+    ]
+  },
+  "baseSepolia": {
+    "chainId": 84532,
+    "GuardVaultCCTP": "0xbEa47f1B7C1252EB2a7C758b27f28ea35ae6c193",
+    "usdc": "0xba50Cd2A20f6DA35D788639E581bca8d0B5d4D5f",
+    "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+    "owner": "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da",
+    "GuardianVault": "0x130E4D571eEa3928d11DC9d9c7C6561C55c6F2fd",
+    "aaveUsdc": "0xba50Cd2A20f6DA35D788639E581bca8d0B5d4D5f",
+    "aaveVenue": "0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27",
+    "aaveAToken": "0x10F1A9D11CDf50041f3f8cB7191CBE2f31750ACC",
+    "guardianOwner": "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da",
+    "guardianAgent": "0x975Bb943F18fe44333eF28D18865ca5A5D63c23D",
+    "guardianHaven": "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da",
+    "GuardianVaultMulti": "0x81AEbF68946D62FDf088579A6F6F2c587015e28A",
+    "markets": [
+      {
+        "key": "moonwell",
+        "apr": 800,
+        "venue": "0xe423fF8fA6EC43E589f1516149CE71206F2eD99f"
+      },
+      {
+        "key": "aave",
+        "apr": 500,
+        "venue": "0x3ee87617e93EcBd5404cccc22dB7542A8449b8CC"
+      },
+      {
+        "key": "compound",
+        "apr": 600,
+        "venue": "0x53335188330e37A4a67c865A30D7Cc891692b751"
+      }
+    ]
+  }
+}

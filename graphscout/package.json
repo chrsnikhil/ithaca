@@ -1,0 +1,45 @@
+{
+  "name": "graphscout",
+  "version": "0.1.0",
+  "description": "A protocol-intelligence MCP layer on top of The Graph's Subgraph MCP. Turns generic discover/schema/query primitives into domain-level tools (understand_protocol, identify_risk_factors, get_protocol_health, detect_anomalies, compare_protocols, assess_risk) so AI agents can reason about on-chain protocols, not just fetch rows.",
+  "type": "module",
+  "bin": {
+    "graphscout": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "selftest": "tsx src/selftest.ts",
+    "test:intel": "tsx src/test-intel.ts",
+    "test:base": "tsx src/test-base.ts",
+    "survey": "tsx src/survey.ts",
+    "smoke": "tsx src/smoke-mcp.ts",
+    "benchmark": "tsx src/benchmark.ts"
+  },
+  "keywords": [
+    "mcp",
+    "the-graph",
+    "subgraph",
+    "ai-agents",
+    "graphql",
+    "model-context-protocol"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "graphql": "^16.9.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.19.0",
+    "typescript": "^5"
+  }
+}

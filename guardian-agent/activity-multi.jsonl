@@ -1,0 +1,146 @@
+{"ts":1788764116233,"tick":1,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776333743,"tick":1,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776351339,"tick":2,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776369346,"tick":3,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776387485,"tick":4,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776409587,"tick":5,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776427737,"tick":6,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776446218,"tick":7,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776464364,"tick":8,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776485017,"tick":9,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776502629,"tick":10,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776520397,"tick":11,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776538697,"tick":12,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776560219,"tick":13,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776578130,"tick":14,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776595149,"tick":15,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776612554,"tick":16,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776634182,"tick":17,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776651293,"tick":18,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776668893,"tick":19,"action":"ARM","reason":"armed by Flex 0xDeC312… — invest cap 100.0, protect cap 100.0"}
+{"ts":1788776669216,"tick":19,"action":"HOLD","reason":"no signed policy — arm the guardian on your Flex"}
+{"ts":1788776687533,"tick":20,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776709473,"tick":21,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776728009,"tick":22,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776745734,"tick":23,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776763590,"tick":24,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776785131,"tick":25,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776803348,"tick":26,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776821185,"tick":27,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776838577,"tick":28,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776861850,"tick":29,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776879620,"tick":30,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776897336,"tick":31,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776915999,"tick":32,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776938184,"tick":33,"action":"HOLD","reason":"no idle funds to deploy"}
+{"ts":1788776957561,"tick":34,"action":"INVEST","venue":"0x53335188330e37A4a67c865A30D7Cc891692b751","reason":"deploying idle USDC into Compound — best risk-adjusted (score 81, graphscout healthy)","amountUsdc":"100.0","txUrl":"https://sepolia.basescan.org/tx/0xc2d9cdc07a7dd7d55772653e1531c134bf1fa82a42cda3b2f8e457cc57762c36"}
+{"ts":1788776975596,"tick":35,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788776994333,"tick":36,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777019646,"tick":37,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777037481,"tick":38,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777055407,"tick":39,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777073332,"tick":40,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777097022,"tick":41,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777115177,"tick":42,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777132846,"tick":43,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777150095,"tick":44,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777172330,"tick":45,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777189360,"tick":46,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777206938,"tick":47,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777224895,"tick":48,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777246547,"tick":49,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777264724,"tick":50,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777282758,"tick":51,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777301261,"tick":52,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777322304,"tick":53,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777340777,"tick":54,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777359543,"tick":55,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777377591,"tick":56,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777398760,"tick":57,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777416630,"tick":58,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777435161,"tick":59,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777452796,"tick":60,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777474402,"tick":61,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777491668,"tick":62,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777509596,"tick":63,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777527490,"tick":64,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777549558,"tick":65,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777566790,"tick":66,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777584193,"tick":67,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777601638,"tick":68,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777622598,"tick":69,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777641028,"tick":70,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777659110,"tick":71,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777676313,"tick":72,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777697471,"tick":73,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777714889,"tick":74,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777732873,"tick":75,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777750565,"tick":76,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777771853,"tick":77,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777789742,"tick":78,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777807788,"tick":79,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777825882,"tick":80,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777847871,"tick":81,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777865914,"tick":82,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777884079,"tick":83,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777901519,"tick":84,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777922537,"tick":85,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777940621,"tick":86,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777958693,"tick":87,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777976582,"tick":88,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788777998605,"tick":89,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778016391,"tick":90,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778034424,"tick":91,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778051758,"tick":92,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778073068,"tick":93,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778091061,"tick":94,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778109560,"tick":95,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778126750,"tick":96,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778148613,"tick":97,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778166950,"tick":98,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778185022,"tick":99,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778203082,"tick":100,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778223763,"tick":101,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778241470,"tick":102,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778259485,"tick":103,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778276968,"tick":104,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778298902,"tick":105,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778316386,"tick":106,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778334806,"tick":107,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778353056,"tick":108,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778373695,"tick":109,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778391687,"tick":110,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778409586,"tick":111,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778427021,"tick":112,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778448507,"tick":113,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778466686,"tick":114,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778484391,"tick":115,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778503108,"tick":116,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778525789,"tick":117,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778543640,"tick":118,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778562325,"tick":119,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778580273,"tick":120,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778601156,"tick":121,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778619163,"tick":122,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778637114,"tick":123,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778654199,"tick":124,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778675079,"tick":125,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778692630,"tick":126,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778711293,"tick":127,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778728713,"tick":128,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778750640,"tick":129,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778768869,"tick":130,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778787244,"tick":131,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778805801,"tick":132,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778826621,"tick":133,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778843939,"tick":134,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778861264,"tick":135,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778878950,"tick":136,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778900829,"tick":137,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778918550,"tick":138,"action":"HOLD","reason":"holding Compound — still the best market"}
+{"ts":1788778951720,"tick":139,"action":"ERROR","reason":"execution reverted (unknown custom error)"}
+{"ts":1788778986934,"tick":140,"action":"ERROR","reason":"execution reverted (unknown custom error)"}
+{"ts":1788779020495,"tick":141,"action":"ERROR","reason":"execution reverted (unknown custom error)"}
+{"ts":1788779058139,"tick":142,"action":"ERROR","reason":"execution reverted (unknown custom error)"}
+{"ts":1788779091437,"tick":143,"action":"ERROR","reason":"execution reverted (unknown custom error)"}
+{"ts":1788779129720,"tick":144,"action":"ERROR","reason":"execution reverted (unknown custom error)"}

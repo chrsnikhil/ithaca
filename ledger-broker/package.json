@@ -1,0 +1,18 @@
+{
+  "name": "guardian-ledger-broker",
+  "version": "0.1.0",
+  "description": "A capability broker built on the Ledger Key Ring: it holds an agent's fund-moving key (device-rooted, never on disk in plaintext) and hands the agent scoped capabilities — sign this bounded action — never the raw key. Includes USB-less (no-Ledger-attached) enrollment for headless hosts.",
+  "type": "commonjs",
+  "bin": { "guardian-broker": "src/broker.js" },
+  "scripts": {
+    "start": "node src/broker.js",
+    "seal": "node src/seal.js",
+    "test": "node --test",
+    "enroll": "node src/enroll.mjs"
+  },
+  "keywords": ["ledger", "key-ring", "lkrp", "ai-agents", "capabilities", "wallet-cli"],
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.17.0"
+  }
+}

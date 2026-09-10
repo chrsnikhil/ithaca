@@ -1,0 +1,42 @@
+# ─── dependencies ───
+**/node_modules/
+
+# ─── SECRETS — never commit (templates .env.example / .env.local.example are kept) ───
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.local.example
+**/.arm-mandate.json
+**/policy.json
+**/policy-multi.json
+
+# ─── build / derived ───
+**/.next/
+**/dist/
+**/build/
+**/out/
+**/.vercel/
+next-env.d.ts
+*.tsbuildinfo
+
+# ─── demo deck: heavy / derived artifacts (keep index.html + assets) ───
+guardian-demo/.shots/
+guardian-demo/frames/
+guardian-demo/*.mp4
+guardian-demo/**/*.tmp.json
+
+# ─── large / generated / backups (not part of the submission) ───
+generated/
+avatars_24src_backup/
+Itinerary.pdf
+
+# ─── OS / editor ───
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# stray tool binaries
+*.exe
+cloudflared*
