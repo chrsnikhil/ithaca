@@ -77,6 +77,18 @@ Explorers: [Base Sepolia](https://sepolia.basescan.org) · [Arc testnet](https:/
 
 ---
 
+## Demo
+
+**Try it live:** open **[guardian-rho-two.vercel.app](https://guardian-rho-two.vercel.app)** in desktop Chrome or Edge — arm on your Ledger (USB *or* Bluetooth) with Face ID, then watch ITHACA sense the markets, deploy into the safest one, and evacuate on danger, verifying every move on-chain.
+
+**The walkthrough:** a self-contained cinematic deck of the whole story lives in [`guardian-demo/`](guardian-demo) — 11 scenes, a procedural voxel world, one offline file.
+- **Watch:** open `guardian-demo/index.html` in Chrome — arrow keys / `1`–`0` to navigate, `N` for presenter notes, `T` for the rehearsal timer, `F` for fullscreen.
+- **Record:** open `guardian-demo/index.html?auto=1&chrome=0`, press `F`, and screen-record ~4 minutes — it auto-plays all 11 scenes and rests on the close.
+
+**Demo video:** _(link coming)_
+
+---
+
 ## The security model — a stolen key can't steal
 
 The whole design is that the **agent key is deliberately low-privilege**. Steal it and here's *everything* you can do:
