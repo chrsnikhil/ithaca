@@ -1,4 +1,4 @@
-# ⚓ ITHACA
+# ITHACA
 
 ### Autonomous yield that always comes home.
 
@@ -7,7 +7,7 @@
 Built for **ETHOnline 2026** across three sponsors — **The Graph**, **Ledger**, and **Circle / Arc** — and live on-chain today.
 
 <p>
-  <b>🟢 LIVE:</b> <a href="https://guardian-rho-two.vercel.app">guardian-rho-two.vercel.app</a> &nbsp;·&nbsp;
+  <b>LIVE:</b> <a href="https://guardian-rho-two.vercel.app">guardian-rho-two.vercel.app</a> &nbsp;·&nbsp;
   <b>Base Sepolia + Arc testnet</b> &nbsp;·&nbsp; <b>Self-custodial</b> &nbsp;·&nbsp; <b>Voice-controlled</b>
 </p>
 
@@ -23,7 +23,7 @@ In 2026 every wallet drowns in data and every AI agent got a wallet — but **no
 
 ---
 
-## 🏆 What we built (and shipped)
+## What we built (and shipped)
 
 ### 1. graphscout — the intelligence layer on The Graph  ·  *`/graphscout`*
 The raw Subgraph MCP hands an agent a firehose: it must discover the subgraph, read a ~20K-token schema, hand-write GraphQL, then *become a DeFi analyst* to interpret raw rows. **graphscout collapses all of that into one semantic call** — `assess_risk({ protocol })` → a decision-ready verdict (score, `healthy/watch/elevated/critical`, findings, evidence). It derives what raw rows can't: utilization, liquidation spikes, market concentration, TVL trend.
@@ -59,7 +59,7 @@ No dashboards, no buttons — you *talk* to ITHACA. A full voice pipeline (**Gem
 
 ---
 
-## 🔗 Live & verifiable
+## Live & verifiable
 
 Everything below is real and on-chain — verify every move yourself.
 
@@ -77,29 +77,29 @@ Explorers: [Base Sepolia](https://sepolia.basescan.org) · [Arc testnet](https:/
 
 ---
 
-## 🛡️ The security model — a stolen key can't steal
+## The security model — a stolen key can't steal
 
 The whole design is that the **agent key is deliberately low-privilege**. Steal it and here's *everything* you can do:
 
 | Agent can call | What it does | Can it steal? |
 |---|---|---|
-| `invest(policy, sig, venue, amount)` | deploy — needs a **Flex-signed** policy, allowlisted venue, ≤ cap | ❌ |
-| `deRisk(venue, amount)` | pull funds back **into the owner's vault** | ❌ |
-| `rebalance(from, to, amount)` | move between **allowlisted venues** only | ❌ |
-| `protect(policy, sig, amount)` | evacuate — only to the **Flex-approved safe haven** | ❌ |
-| `ownerWithdraw(amount, to)` | send anywhere | ❌ **onlyOwner** |
+| `invest(policy, sig, venue, amount)` | deploy — needs a **Flex-signed** policy, allowlisted venue, ≤ cap | No |
+| `deRisk(venue, amount)` | pull funds back **into the owner's vault** | No |
+| `rebalance(from, to, amount)` | move between **allowlisted venues** only | No |
+| `protect(policy, sig, amount)` | evacuate — only to the **Flex-approved safe haven** | No |
+| `ownerWithdraw(amount, to)` | send anywhere | No **onlyOwner** |
 
 A fully compromised agent key **cannot send one dollar to an attacker** — every fund-exit path needs a signature only the Ledger can produce, to an address only the Ledger approved. The Ledger revokes/rotates the agent at will; the mandate auto-expires. The one key that matters never leaves the device.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 - **Fully serverless & self-custodial.** The mandate lives in the browser; the deployed app arms + acts on its own via API routes — no central daemon required. The signature *is* the capability; the on-chain contract re-verifies every action.
 - **On-chain enforcement.** `GuardianVaultMulti` (Solidity) enforces the caps, the venue allowlist, the safe-haven allowlist, single-use escalations, and expiry — in the same transaction as every action.
 - **Multi-chain.** Deployed & live on Base Sepolia and Arc testnet; deployment-ready for Arc mainnet.
 
-## 📁 Repo map
+## Repo map
 | Dir | What |
 |---|---|
 | `guardian/` | The voice-first PWA (Next.js 16 / React 19) — arm, watch, verify. Deployed on Vercel. |
@@ -111,7 +111,7 @@ A fully compromised agent key **cannot send one dollar to an attacker** — ever
 
 > **Note:** *ITHACA* is the product name; internal modules keep the project's working prefix `guardian-`.
 
-## ▶️ Run it
+## Run it
 ```bash
 # The app (voice PWA)
 cd guardian && npm install && npm run dev        # → localhost:3000
