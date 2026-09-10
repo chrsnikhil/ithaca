@@ -111,6 +111,25 @@ A fully compromised agent key **cannot send one dollar to an attacker** — ever
 - **On-chain enforcement.** `GuardianVaultMulti` (Solidity) enforces the caps, the venue allowlist, the safe-haven allowlist, single-use escalations, and expiry — in the same transaction as every action.
 - **Multi-chain.** Deployed & live on Base Sepolia and Arc testnet; deployment-ready for Arc mainnet.
 
+```mermaid
+flowchart LR
+  U([You]):::u -->|voice| A
+  G["graphscout · The Graph<br/>live risk, ~98x fewer tokens"]:::graph -->|decision-ready verdict| A
+  L["Ledger Flex<br/>root of trust"]:::ledger -->|sign once · EIP-712 mandate| V
+  A["ITHACA agent<br/>bounded, disposable key"]:::agent -->|invest / rotate / protect<br/>within the mandate| V
+  V["GuardianVault<br/>on-chain enforcement<br/>Base + Arc"]:::vault -->|caps + venue allowlist| M[("Markets<br/>Aave · Compound · Moonwell")]
+  V -->|danger: evacuate| H[["Safe haven"]]
+  V -->|CCTP cross-chain| ARC[["Arc · USYC<br/>safe harbor"]]:::circle
+  classDef u fill:#0b0f12,stroke:#35E0FF,color:#fff
+  classDef agent fill:#0b0f12,stroke:#4C6FFF,color:#fff
+  classDef graph fill:#0b0f12,stroke:#35E0FF,color:#fff
+  classDef ledger fill:#0b0f12,stroke:#fff,color:#fff
+  classDef vault fill:#0b0f12,stroke:#35E0FF,color:#fff
+  classDef circle fill:#0b0f12,stroke:#4C6FFF,color:#fff
+```
+
+*The Graph gives it eyes · Ledger gives it a conscience · Circle/Arc gives it a safe harbor.*
+
 ## Repo map
 | Dir | What |
 |---|---|
