@@ -1,8 +1,8 @@
 import "server-only";
 import { ethers } from "ethers";
 import { computeMarkets } from "./markets";
-import * as vault from "./vaultMulti";
-import type { Policy, Escalation } from "./vaultMulti";
+import { vaultFor, type Policy, type Escalation } from "./vaultMulti";
+import type { Network } from "./deployments";
 
 // Guardian's autonomous BRAIN, ported from the daemon to run stateless inside Vercel. One tick:
 //   rank the markets (graphscout) → read chain state → decide (protect on danger / invest idle /
@@ -23,7 +23,8 @@ export type TickResult = {
 
 // The dashboard's state view: real multi-vault balances + the live market ranking, positions merged
 // in. Shape matches what GuardianShell expects (position = total invested; apr = the pick's yield).
-export async function stateView(haven?: string) {
+export async function stateView(haven?: string, network: Network = "baseSepolia") {
+  const vault = vaultFor(network);
   const [st, ranked] = await Promise.all([
     vault.readMultiState(haven),
     computeMarkets() as Promise<Ranked[]>,
@@ -43,7 +44,8 @@ export async function stateView(haven?: string) {
 
 // AUTONOMOUS tick — decide + act. `danger` is the client-side "simulate danger" flip (the demo's
 // crisis trigger); a real critical verdict from graphscout evacuates too.
-export async function runTick(policy: Policy, signature: string, danger = false): Promise<TickResult> {
+export async function runTick(policy: Policy, signature: string, danger = false, network: Network = "baseSepolia"): Promise<TickResult> {
+  const vault = vaultFor(network);
   const v = vault.verifyPolicy(policy, signature);
   if (!v.ok) return { ok: false, action: "ERROR", reason: v.error || "bad policy", error: v.error };
 
@@ -93,7 +95,8 @@ export async function runTick(policy: Policy, signature: string, danger = false)
 }
 
 // EXPLICIT commands (voice "put my money to work" / the panel buttons).
-export async function runCommand(policy: Policy, signature: string, action: string, amountUsdc?: number): Promise<TickResult> {
+export async function runCommand(policy: Policy, signature: string, action: string, amountUsdc?: number, network: Network = "baseSepolia"): Promise<TickResult> {
+  const vault = vaultFor(network);
   const v = vault.verifyPolicy(policy, signature);
   if (!v.ok) return { ok: false, action: "ERROR", reason: v.error || "bad policy", error: v.error };
 
@@ -138,7 +141,8 @@ export async function runCommand(policy: Policy, signature: string, action: stri
 }
 
 // HIGH-RISK: a single-use, freshly Flex-approved evacuation beyond the standing mandate.
-export async function runEscalation(escalation: Escalation, signature: string, amountUsdc?: number): Promise<TickResult> {
+export async function runEscalation(escalation: Escalation, signature: string, amountUsdc?: number, network: Network = "baseSepolia"): Promise<TickResult> {
+  const vault = vaultFor(network);
   const v = vault.verifyEscalation(escalation, signature);
   if (!v.ok) return { ok: false, action: "ERROR", reason: v.error || "bad escalation", error: v.error };
   const amt = amountUsdc != null ? big(amountUsdc) : BigInt(escalation.amount);

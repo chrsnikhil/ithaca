@@ -10,9 +10,10 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { escalation, signature, amountUsdc } = body || {};
+  const network = body?.network === "arc" ? "arc" : "baseSepolia"; // absent ⇒ Base Sepolia (unchanged)
   if (!escalation || !signature) return Response.json({ ok: false, error: "missing escalation or signature" });
   try {
-    return Response.json(await runEscalation(escalation, signature, amountUsdc != null ? Number(amountUsdc) : undefined));
+    return Response.json(await runEscalation(escalation, signature, amountUsdc != null ? Number(amountUsdc) : undefined, network));
   } catch (e) {
     return Response.json({ ok: false, error: e instanceof Error ? e.message : String(e) });
   }

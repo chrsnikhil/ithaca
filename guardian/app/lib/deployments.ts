@@ -1,6 +1,10 @@
 // Deployed Guardian contracts (owner = the Ledger Flex). See guardian-contracts/deployments.json.
 export const FLEX_OWNER = "0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da";
 
+// The networks the app can arm on. "baseSepolia" is and stays the default everywhere; "arc" is the
+// Flex-owned Arc testnet vault. A missing/legacy network resolves to "baseSepolia" (back-compat).
+export type Network = "baseSepolia" | "arc";
+
 export const DEPLOYMENTS = {
   arc: {
     chainId: 5042002,

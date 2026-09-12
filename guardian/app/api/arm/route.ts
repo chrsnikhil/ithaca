@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { verifyPolicy } from "../../lib/vaultMulti";
+import { vaultFor } from "../../lib/vaultMulti";
 
 // Arming is now CLIENT-side: the browser keeps the Flex-signed mandate in localStorage and hands it
 // to /api/tick|act on each call. This route just VERIFIES the signature server-side (recovers to the
@@ -10,8 +10,9 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { policy, signature } = body || {};
+  const network = body?.network === "arc" ? "arc" : "baseSepolia"; // absent ⇒ Base Sepolia (unchanged)
   if (!policy || !signature) return Response.json({ ok: false, error: "missing policy or signature" });
-  const v = verifyPolicy(policy, signature);
+  const v = vaultFor(network).verifyPolicy(policy, signature);
   return Response.json(v.ok ? { ok: true, signer: v.signer } : { ok: false, error: v.error });
 }
 

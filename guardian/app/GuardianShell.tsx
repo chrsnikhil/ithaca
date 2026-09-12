@@ -13,7 +13,7 @@ import { VoicePicker } from "@/components/ui/voice-picker";
 import { useGuardianVoice, type VoiceState } from "./lib/useGuardianVoice";
 import { useLedgerPolicy, type PolicyParams, type Transport } from "./lib/useLedgerPolicy";
 import { faceIdGate } from "./lib/faceId";
-import { FLEX_OWNER } from "./lib/deployments";
+import { FLEX_OWNER, DEPLOYMENTS, type Network } from "./lib/deployments";
 import { loadMandate, saveMandate, clearMandate, importMandateFromURL, type StoredMandate } from "./lib/mandate";
 
 type PanelId = "balances" | "positions" | "investments" | "mandates" | "activity" | "markets";
@@ -64,6 +64,13 @@ const ago = (ts: number) => {
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
   if (s < 60) return s + "s"; if (s < 3600) return Math.floor(s / 60) + "m"; return Math.floor(s / 3600) + "h";
 };
+
+// Base is the default; Arc is the Flex-owned Arc testnet vault. Used for the arm toggle + labels.
+const NET_LABEL: Record<Network, string> = { baseSepolia: "Base Sepolia", arc: "Arc Testnet" };
+const netName = (chainId?: number, fallback: Network = "baseSepolia") =>
+  chainId === DEPLOYMENTS.arc.chainId ? "Arc Testnet"
+  : chainId === DEPLOYMENTS.baseSepolia.chainId ? "Base Sepolia"
+  : NET_LABEL[fallback];
 
 /* dock destinations — presentational grouping of the same panels.
    "Me" (character picker) moved to a top-bar avatar chip to make room
@@ -231,6 +238,7 @@ export default function GuardianShell() {
   const [escMsg, setEscMsg] = useState("");
   const [escalating, setEscalating] = useState(false);
   const [signVia, setSignVia] = useState<Transport>("usb"); // USB (WebHID) or Bluetooth (Web BLE)
+  const [network, setNetwork] = useState<Network>("baseSepolia"); // which chain to arm on — Base is default
   const actTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pokeRef = useRef<() => void>(() => {});
   // client-held mandate (localStorage) — the serverless app arms + acts with no daemon
@@ -241,9 +249,12 @@ export default function GuardianShell() {
 
   const refresh = useCallback(async () => {
     try {
+      // read the chain the mandate is armed on (or, before arming, the one selected in the toggle)
+      const net = mandateRef.current?.network ?? network;
+      const q = `&network=${net}`;
       const [s, a] = await Promise.all([
-        fetch("/api/guardian?view=state", { cache: "no-store" }).then((r) => r.json()),
-        fetch("/api/guardian?view=activity", { cache: "no-store" }).then((r) => r.json()),
+        fetch(`/api/guardian?view=state${q}`, { cache: "no-store" }).then((r) => r.json()),
+        fetch(`/api/guardian?view=activity${q}`, { cache: "no-store" }).then((r) => r.json()),
       ]);
       // the server view is stateless (no policy); overlay the client-held mandate so the mandate
       // panels stay populated across refreshes
@@ -253,7 +264,7 @@ export default function GuardianShell() {
       }
       if (Array.isArray(a?.items)) setFeed(a.items);
     } catch {}
-  }, []);
+  }, [network]);
   pokeRef.current = refresh;
 
   const flashAction = useCallback((a: ActionState) => {
@@ -336,6 +347,7 @@ export default function GuardianShell() {
     if (m) {
       mandateRef.current = m;
       setArmedLocal(true);
+      setNetwork(m.network ?? "baseSepolia"); // reflect the chain this mandate was armed on
       setGstate((g) => ({ ...g, policy: { ...m.policy, signer: m.signer } }));
     }
   }, []);
@@ -353,7 +365,7 @@ export default function GuardianShell() {
       try {
         const r = await fetch("/api/tick", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ policy: m.policy, signature: m.signature, danger: dangerOn }),
+          body: JSON.stringify({ policy: m.policy, signature: m.signature, danger: dangerOn, network: m.network ?? "baseSepolia" }),
         });
         const j = await r.json();
         // mandate expired or wrong signer → disarm cleanly (drop the stored mandate)
@@ -419,7 +431,7 @@ export default function GuardianShell() {
     try {
       await fetch("/api/act", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ policy: m.policy, signature: m.signature, action: act }),
+        body: JSON.stringify({ policy: m.policy, signature: m.signature, action: act, network: m.network ?? "baseSepolia" }),
       });
     } catch {}
     setTimeout(refresh, 1500); setTimeout(() => { refresh(); setBusy(false); }, 6000);
@@ -437,7 +449,7 @@ export default function GuardianShell() {
       try {
         await fetch("/api/tick", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ policy: m.policy, signature: m.signature, danger: true }),
+          body: JSON.stringify({ policy: m.policy, signature: m.signature, danger: true, network: m.network ?? "baseSepolia" }),
         });
       } catch {}
       setTimeout(refresh, 1500); setTimeout(refresh, 6000);
@@ -456,7 +468,7 @@ export default function GuardianShell() {
       const bio = await faceIdGate();
       if (!bio.ok) throw new Error("Face ID required to arm — " + (bio.error || "cancelled"));
       setArmMsg(bio.skipped ? "Approve on your Flex…" : "Face ID ✓ — approve on your Flex…");
-    });
+    }, network);
     // On failure, clear armMsg so the hint surfaces the SPECIFIC ledgerStatus (e.g. "no Flex found",
     // the exact DMK error) instead of a generic line.
     if (!signed) { setArmMsg(""); setSigning(false); return; }
@@ -464,17 +476,17 @@ export default function GuardianShell() {
     // Verify server-side (recovers to the Flex owner), then STORE the mandate on this device. No
     // daemon: the app is now armed and the autonomous loop (the tick effect) takes over.
     try {
-      const r = await fetch("/api/arm", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ policy: signed.policy, signature: signed.signature }) });
+      const r = await fetch("/api/arm", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ policy: signed.policy, signature: signed.signature, network }) });
       const j = await r.json();
       if (!j.ok) { setArmMsg("rejected: " + (j.error || "signature check failed")); setSigning(false); return; }
     } catch { /* verify endpoint hiccup — the signature is valid locally, proceed */ }
-    const m: StoredMandate = { policy: signed.policy as StoredMandate["policy"], signature: signed.signature, signer: signed.signer, armedAt: Date.now() };
+    const m: StoredMandate = { policy: signed.policy as StoredMandate["policy"], signature: signed.signature, signer: signed.signer, armedAt: Date.now(), network };
     saveMandate(m); mandateRef.current = m; setArmedLocal(true);
     setGstate((g) => ({ ...g, policy: { ...m.policy, signer: m.signer } }));
     setArmMsg("armed"); refresh();
     setTimeout(() => { setProposed(null); setArmMsg(""); }, 2600);
     setSigning(false);
-  }, [proposed, signing, armMultiWithLedger, refresh, signVia]);
+  }, [proposed, signing, armMultiWithLedger, refresh, signVia, network]);
 
   // HIGH-RISK path: a fresh, single-use Flex approval to evacuate everything to the cold safe
   // haven right now — beyond the standing mandate. Face ID, then a live Flex signature.
@@ -483,22 +495,24 @@ export default function GuardianShell() {
     const amt = n(gstate.idle) + n(gstate.position);
     if (amt < 1) { setEscMsg("nothing to evacuate"); return; }
     setEscalating(true); setEscMsg(signVia === "ble" ? "Pick your Flex over Bluetooth…" : "Connect your Flex…");
+    // evacuate the currently-armed vault — use the mandate's chain (falls back to the toggle / Base)
+    const enet: Network = mandateRef.current?.network ?? network;
     // Flex first (device chooser needs the tap's gesture), then Face ID, then the live approval.
     const signed = await signEscalation({ amountUsdc: amt, safeHaven: FLEX_OWNER, hours: 1 }, signVia, async () => {
       setEscMsg("Confirm with Face ID…");
       const bio = await faceIdGate();
       if (!bio.ok) throw new Error("Face ID required — " + (bio.error || "cancelled"));
       setEscMsg("Approve this evacuation on your Flex…");
-    });
+    }, enet);
     if (!signed?.ok) { setEscMsg(signed ? "signed by a different address than your Flex" : "Flex signing failed / cancelled"); setEscalating(false); return; }
     try {
-      const r = await fetch("/api/escalate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ escalation: signed.escalation, signature: signed.signature, amountUsdc: amt }) });
+      const r = await fetch("/api/escalate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ escalation: signed.escalation, signature: signed.signature, amountUsdc: amt, network: enet }) });
       const j = await r.json();
       setEscMsg(j.ok ? "✓ evacuated to your cold wallet" : (j.error || j.reason || "failed"));
       if (j.ok) setTimeout(refresh, 2500);
     } catch (e) { setEscMsg("relay failed: " + (e instanceof Error ? e.message : String(e))); }
     setEscalating(false);
-  }, [escalating, gstate.idle, gstate.position, signEscalation, refresh, signVia]);
+  }, [escalating, gstate.idle, gstate.position, signEscalation, refresh, signVia, network]);
 
   const latest = feed[0];
   const charMeta = CHARS.find((c) => c.id === char) ?? CHARS[0];
@@ -705,7 +719,7 @@ export default function GuardianShell() {
               <div className="fl-row"><span className="k">Safe haven</span><span className="v">{short(FLEX_OWNER)}</span></div>
             </div>
             <div className="gx-note">Ask for a new mandate in conversation — the guardian drafts it on screen and you approve it on your Ledger Flex. Whichever face you choose, the same signed mandate applies.</div>
-            <div className="sheet-foot">Base Sepolia · vault {short(gstate.vault)} · voice works best in desktop Chrome/Edge</div>
+            <div className="sheet-foot">{netName(gstate.chainId, network)} · vault {short(gstate.vault)} · voice works best in desktop Chrome/Edge</div>
           </div>
         </div>
       )}
@@ -764,6 +778,14 @@ export default function GuardianShell() {
               <div className="fl-row"><span className="k">Protect up to</span><span className="v">{money(proposedSheet.shown.protectUsdc)} USDC</span></div>
               <div className="fl-row"><span className="k">Safe haven</span><span className="v">{short(proposedSheet.shown.safeHaven)}</span></div>
               <div className="fl-row"><span className="k">Valid for</span><span className="v">{proposedSheet.shown.hours} hours</span></div>
+            </div>
+            {/* which chain to arm on — Base Sepolia (default) or the Flex-owned Arc testnet vault */}
+            <div className="gx-segbar" role="tablist" aria-label="Network" style={{ marginTop: 12 }}>
+              <button role="tab" aria-selected={network === "baseSepolia"} className={"gx-segbtn" + (network === "baseSepolia" ? " active" : "")} onClick={() => setNetwork("baseSepolia")} disabled={signing}>Base Sepolia</button>
+              <button role="tab" aria-selected={network === "arc"} className={"gx-segbtn" + (network === "arc" ? " active" : "")} onClick={() => setNetwork("arc")} disabled={signing}>Arc</button>
+            </div>
+            <div className="gx-hint" style={{ textAlign: "center", marginTop: 6 }}>
+              {NET_LABEL[network]} · vault {short(DEPLOYMENTS[network].GuardianVaultMulti)} · {network === "arc" ? DEPLOYMENTS.arc.explorer.replace(/^https?:\/\//, "") : DEPLOYMENTS.baseSepolia.explorerBase.replace(/^https?:\/\//, "")}
             </div>
             {/* connect the Flex over USB (WebHID) or wirelessly over Bluetooth (Web BLE) */}
             <div className="gx-segbar" role="tablist" aria-label="Connect the Flex via" style={{ marginTop: 12 }}>
@@ -825,7 +847,7 @@ function Panel(props: {
       <div className="fl-rows">
         <div className="fl-row"><span className="k">Venue</span><span className="v">{marketName.toUpperCase()}</span></div>
         <div className="fl-row"><span className="k">Vault</span><span className="v"><a href={`${ex}/address/${g.vault}`} target="_blank" rel="noreferrer" style={{ color: "var(--mint)" }}>{short(g.vault)}</a></span></div>
-        <div className="fl-row"><span className="k">Chain</span><span className="v">BASE SEPOLIA</span></div>
+        <div className="fl-row"><span className="k">Chain</span><span className="v">{netName(g.chainId).toUpperCase()}</span></div>
       </div>
       {invested < 1 && <div className="gx-empty">Nothing deployed right now.</div>}
     </>

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import { ethers } from "ethers";
-import { DEPLOYMENTS, FLEX_OWNER } from "./deployments";
+import { DEPLOYMENTS, FLEX_OWNER, type Network } from "./deployments";
 
 function errStr(e: unknown): string {
   if (e instanceof Error) return e.message;
@@ -93,6 +93,12 @@ const EIP712_DOMAIN = [
   { name: "chainId", type: "uint256" }, { name: "verifyingContract", type: "address" },
 ];
 
+// EIP-712 domain for the selected network. Only chainId + verifyingContract differ per chain; the
+// name/version and the Flex owner are identical on both. Defaults to Base Sepolia.
+function domainFor(network: Network, verifyingContract: string) {
+  return { name: "Guardian", version: "1", chainId: DEPLOYMENTS[network].chainId, verifyingContract };
+}
+
 // Sign a GuardianVault Policy / GuardianVaultMulti Policy / Escalation on the Ledger Flex (EIP-712).
 // One signature authorizes an autonomous policy the agent then acts within, until expiry. The
 // verifyingContract is the Flex-owned vault, so the signature recovers to the Flex owner.
@@ -101,11 +107,13 @@ export function useLedgerPolicy() {
   const [result, setResult] = useState<SignedPolicy | null>(null);
 
   // Single-vault v2 Policy (has a per-venue field). Kept for the Aave-only demo path.
-  const armWithLedger = useCallback(async (p: PolicyParams, transport: Transport = "usb"): Promise<SignedPolicy | null> => {
+  const armWithLedger = useCallback(async (p: PolicyParams, transport: Transport = "usb", network: Network = "baseSepolia"): Promise<SignedPolicy | null> => {
     setStatus("connecting to Flex…"); setResult(null);
     try {
       const { signerEth } = await connectSignerEth(transport, setStatus);
-      const guard = DEPLOYMENTS.baseSepolia.GuardianVault;
+      const guard = DEPLOYMENTS[network].GuardianVault;
+      // single-vault v2 has a per-venue field; the Aave venue only exists on Base (this legacy path
+      // is Base-only — the multi-market flow below is the network-aware one).
       const venue = DEPLOYMENTS.baseSepolia.aaveVenue;
       const expiry = Math.floor(Date.now() / 1000) + p.hours * 3600;
       const message = {
@@ -116,7 +124,7 @@ export function useLedgerPolicy() {
         expiry: expiry.toString(),
         nonce: Math.floor(Date.now() / 1000).toString(),
       };
-      const domain = { name: "Guardian", version: "1", chainId: DEPLOYMENTS.baseSepolia.chainId, verifyingContract: guard };
+      const domain = domainFor(network, guard);
       const policyType = [
         { name: "investCap", type: "uint256" }, { name: "venue", type: "address" },
         { name: "protectCap", type: "uint256" }, { name: "safeHaven", type: "address" },
@@ -140,12 +148,12 @@ export function useLedgerPolicy() {
   // MULTI-market Policy (GuardianVaultMulti) — NO per-venue field: { investCap, protectCap,
   // safeHaven, expiry, nonce }. Authorizes the agent to allocate across ALL allowlisted markets up
   // to investCap and evacuate up to protectCap to the safe haven.
-  const armMultiWithLedger = useCallback(async (p: PolicyParams, transport: Transport = "usb", beforeSign?: BeforeSign): Promise<SignedPolicy | null> => {
+  const armMultiWithLedger = useCallback(async (p: PolicyParams, transport: Transport = "usb", beforeSign?: BeforeSign, network: Network = "baseSepolia"): Promise<SignedPolicy | null> => {
     setStatus("connecting to Flex…"); setResult(null);
     try {
       const { signerEth } = await connectSignerEth(transport, setStatus);
       if (beforeSign) await beforeSign(); // Face ID — after the device request (needs the gesture), before signing
-      const guard = DEPLOYMENTS.baseSepolia.GuardianVaultMulti;
+      const guard = DEPLOYMENTS[network].GuardianVaultMulti;
       const expiry = Math.floor(Date.now() / 1000) + p.hours * 3600;
       const message = {
         investCap: BigInt(Math.round(p.investUsdc * 1e6)).toString(),
@@ -154,7 +162,7 @@ export function useLedgerPolicy() {
         expiry: expiry.toString(),
         nonce: Math.floor(Date.now() / 1000).toString(),
       };
-      const domain = { name: "Guardian", version: "1", chainId: DEPLOYMENTS.baseSepolia.chainId, verifyingContract: guard };
+      const domain = domainFor(network, guard);
       const policyType = [
         { name: "investCap", type: "uint256" }, { name: "protectCap", type: "uint256" },
         { name: "safeHaven", type: "address" }, { name: "expiry", type: "uint256" }, { name: "nonce", type: "uint256" },
@@ -176,19 +184,19 @@ export function useLedgerPolicy() {
 
   // HIGH-RISK: a FRESH, single-use Escalation — one specific evacuation (amount → destination)
   // beyond the standing mandate. The live "the Ledger approves the dangerous action in the moment" tap.
-  const signEscalation = useCallback(async (p: { amountUsdc: number; safeHaven: string; hours?: number }, transport: Transport = "usb", beforeSign?: BeforeSign) => {
+  const signEscalation = useCallback(async (p: { amountUsdc: number; safeHaven: string; hours?: number }, transport: Transport = "usb", beforeSign?: BeforeSign, network: Network = "baseSepolia") => {
     setStatus("connecting to Flex…");
     try {
       const { signerEth } = await connectSignerEth(transport, setStatus);
       if (beforeSign) await beforeSign(); // Face ID — after the device request (needs the gesture), before signing
-      const guard = DEPLOYMENTS.baseSepolia.GuardianVaultMulti;
+      const guard = DEPLOYMENTS[network].GuardianVaultMulti;
       const message = {
         amount: BigInt(Math.round(p.amountUsdc * 1e6)).toString(),
         safeHaven: p.safeHaven,
         expiry: (Math.floor(Date.now() / 1000) + (p.hours ?? 1) * 3600).toString(),
         nonce: Math.floor(Date.now() / 1000).toString(),
       };
-      const domain = { name: "Guardian", version: "1", chainId: DEPLOYMENTS.baseSepolia.chainId, verifyingContract: guard };
+      const domain = domainFor(network, guard);
       const escType = [
         { name: "amount", type: "uint256" }, { name: "safeHaven", type: "address" },
         { name: "expiry", type: "uint256" }, { name: "nonce", type: "uint256" },

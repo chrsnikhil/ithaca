@@ -10,9 +10,10 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { policy, signature, action, amountUsdc } = body || {};
+  const network = body?.network === "arc" ? "arc" : "baseSepolia"; // absent ⇒ Base Sepolia (unchanged)
   if (!policy || !signature || !action) return Response.json({ ok: false, error: "missing policy, signature or action" });
   try {
-    return Response.json(await runCommand(policy, signature, String(action), amountUsdc != null ? Number(amountUsdc) : undefined));
+    return Response.json(await runCommand(policy, signature, String(action), amountUsdc != null ? Number(amountUsdc) : undefined, network));
   } catch (e) {
     return Response.json({ ok: false, error: e instanceof Error ? e.message : String(e) });
   }

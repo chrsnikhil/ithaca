@@ -1,5 +1,7 @@
 "use client";
 
+import type { Network } from "./deployments";
+
 // The Flex-signed mandate lives in the BROWSER (localStorage), not on any server. Serverless has
 // no place to keep it, and it shouldn't need one: the signature IS the capability. The client hands
 // {policy, signature} to /api/tick|act|escalate on each call; the server verifies + executes with
@@ -10,6 +12,8 @@ export type StoredMandate = {
   signature: string;
   signer: string;
   armedAt: number;
+  // which chain this mandate was signed for. Absent on legacy/old stored mandates ⇒ "baseSepolia".
+  network?: Network;
 };
 
 const KEY = "guardian.mandate";
@@ -19,7 +23,8 @@ export function loadMandate(): StoredMandate | null {
     const j = JSON.parse(localStorage.getItem(KEY) || "null") as StoredMandate | null;
     if (!j?.policy?.expiry || !j.signature) return null;
     if (Number(j.policy.expiry) * 1000 < Date.now()) { localStorage.removeItem(KEY); return null; } // expired
-    return j;
+    // back-compat: a mandate signed before the network toggle existed is a Base Sepolia mandate.
+    return { ...j, network: j.network ?? "baseSepolia" };
   } catch { return null; }
 }
 
