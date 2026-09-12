@@ -55,3 +55,10 @@ cloudflared*
 *.mp4
 *.mp3
 *.docx
+
+# ─── internal working docs (kept locally, not in the public submission repo) ───
+submissions/
+guardian-demo/POLISH.md
+guardian-demo/SCRIPT.md
+**/CLAUDE.md
+**/AGENTS.md

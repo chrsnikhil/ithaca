@@ -142,7 +142,6 @@ flowchart LR
 | `graphscout/` | The Graph intelligence layer, the MCP server, and the live benchmark. |
 | `ledger-broker/` | The Ledger Key Ring capability broker (scoped signing, software enrollment for USB-less hosts). |
 | `guardian-demo/` | The cinematic demo deck (single file, offline, 11 scenes, 120fps). |
-| `submissions/` | The ETHOnline 2026 submission copy, per-prize answers, and the gap-closure runbook. |
 
 > **Note:** ITHACA is the product name. Internal modules keep the project's working prefix `guardian-`.
 

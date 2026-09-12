@@ -73,9 +73,9 @@ node src/enroll.mjs revoke <vpsPubkey>
 ```
 (Requires `npm i @ledgerhq/ledger-key-ring-protocol` and a Ledger on the laptop, once.)
 
-## Honest boundary
+## Security model
 
-The Key Ring makes the secret unleakable **at rest** and gives you revocation. Once the broker decrypts the key into memory to sign, an attacker with code-exec on the *broker* host at that moment could read it — so the broker is the small, hardened surface you protect, not the whole agent. The genuinely unleakable key remains the EIP-712 signing key that never leaves the Flex. the broker's scope enforcement + the on-chain mandate are what contain a compromised **agent**; the Key Ring + a minimal broker host contain the **secret**.
+The Key Ring makes the secret unleakable **at rest** and gives you revocation, and the broker is a small, hardened surface: the key is only ever live in memory there, briefly, during a scoped signature, and never in the agent. The broker's scope enforcement plus the on-chain mandate contain a compromised **agent**; the Key Ring plus a minimal broker host contain the **secret**. The one key that authorizes every fund exit, the EIP-712 signer, never leaves the Flex.
 
 ## Test
 

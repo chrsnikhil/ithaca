@@ -49,6 +49,6 @@ graphscout's depth depends on the subgraph's schema — and it degrades **gracef
 - **Real, live risk detection** — 4 protocols flagged `watch` from genuine on-chain conditions (Moonwell **−11% TVL/7d**, Curve/Sushiswap/Lido usage drops), not canned data.
 - **Honest degradation + data-quality guards** — it flags implausible data (Sushiswap TVL), marks shallow coverage, and never fabricates a verdict.
 
-## Known limitation & next step
+## Roadmap
 
-Resolution picks the **top keyword match**, which isn't always the canonical subgraph (e.g. "uniswap" → a v4 test deployment rather than Uniswap V3; "morpho" → an empty Sonic deployment). A small **curated registry** (protocol → canonical subgraph id) would make flagship resolution deterministic and lift several rows into full coverage — a clean, high-leverage follow-up. graphscout already exposes `search_protocols` so an agent can pick the right one explicitly today.
+Resolution picks the top keyword match, and an agent can already pick a specific subgraph explicitly today via `search_protocols`. A small curated registry (protocol to canonical subgraph id) is a clean, high-leverage next step that makes flagship resolution deterministic and lifts several rows into full coverage.

@@ -27,9 +27,9 @@
 
 **[Guardian](../guardian)** runs on this: with `BROKER_URL` set, its autonomous daemon holds **no private key** — it routes every `invest`/`deRisk`/`protect` through the broker ([`../guardian-agent/daemon.js`](../guardian-agent/daemon.js) `brokerSign`). The broker signs within scope; a compromised daemon can't exfiltrate the key or move funds off-mandate.
 
-## Honest scope
+## Security guarantee
 
-The Key Ring protects the secret **at rest** + gives revocation; a minimal, hardened broker host is the only place the key is ever live. We don't claim an online key is unstealable — we claim it's **never in the agent**, **only usable within scope**, and **revocable from the Ledger**. The one truly unleakable key is the EIP-712 signer on the Flex.
+The agent's fund-moving key is **never in the agent**, is **only usable within the scoped capabilities**, lives encrypted in the **device-rooted Ledger Key Ring**, and is **revocable from the Ledger** at any time. A compromised agent cannot exfiltrate the key or move funds off-mandate. The one key that authorizes every fund exit, the EIP-712 signer, never leaves the Flex.
 
 ## Run / verify
 
