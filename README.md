@@ -114,7 +114,7 @@ A fully compromised agent key **cannot send one dollar to an attacker** — ever
 ```mermaid
 flowchart LR
   U([You]):::u -->|voice| A
-  G["graphscout · The Graph<br/>live risk, ~98x fewer tokens"]:::graph -->|decision-ready verdict| A
+  G["graphscout · The Graph<br/>live risk, ~98x fewer tokens"]:::scout -->|decision-ready verdict| A
   L["Ledger Flex<br/>root of trust"]:::ledger -->|sign once · EIP-712 mandate| V
   A["ITHACA agent<br/>bounded, disposable key"]:::agent -->|invest / rotate / protect<br/>within the mandate| V
   V["GuardianVault<br/>on-chain enforcement<br/>Base + Arc"]:::vault -->|caps + venue allowlist| M[("Markets<br/>Aave · Compound · Moonwell")]
@@ -122,7 +122,7 @@ flowchart LR
   V -->|CCTP cross-chain| ARC[["Arc · USYC<br/>safe harbor"]]:::circle
   classDef u fill:#0b0f12,stroke:#35E0FF,color:#fff
   classDef agent fill:#0b0f12,stroke:#4C6FFF,color:#fff
-  classDef graph fill:#0b0f12,stroke:#35E0FF,color:#fff
+  classDef scout fill:#0b0f12,stroke:#35E0FF,color:#fff
   classDef ledger fill:#0b0f12,stroke:#fff,color:#fff
   classDef vault fill:#0b0f12,stroke:#35E0FF,color:#fff
   classDef circle fill:#0b0f12,stroke:#4C6FFF,color:#fff
