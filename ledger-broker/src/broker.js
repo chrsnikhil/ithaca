@@ -4,8 +4,8 @@
 // The problem (Ledger "AI Agents x Ledger" track): an autonomous agent needs a fund-moving key,
 // but a key in the agent's process is a key that can leak. The broker inverts that: it owns the
 // key (loaded from the Ledger Key Ring — see secret-store.js), and hands the agent only SCOPED
-// CAPABILITIES. The agent can ask the broker to "sign a GuardianVault invest/deRisk/protect",
-// and nothing else. The broker will never sign a transaction to any other address, never call
+// CAPABILITIES. The agent can ask the broker to "sign a GuardianVaultMulti invest/deRisk/rebalance/
+// protect", and nothing else. The broker will never sign a transaction to any other address, never call
 // any other method, and never return the raw key. A fully compromised agent still can't move
 // funds anywhere but through the on-chain-mandated Guardian actions.
 //
@@ -22,11 +22,15 @@ const { ethers } = require("ethers");
 const { loadSecret } = require("./secret-store");
 
 // The ONLY methods the broker will ever sign, and only against the ONE configured vault.
-const CAPABILITY_METHODS = new Set(["invest", "deRisk", "protect"]);
+// Scoped to GuardianVaultMulti (the multi-market vault the agent actually drives): invest deploys
+// into an allowlisted venue, rebalance rotates between venues, deRisk pulls a venue back, protect
+// evacuates to the Flex-approved safe haven. Every one is on-chain-bounded by the Flex-signed Policy.
+const CAPABILITY_METHODS = new Set(["invest", "deRisk", "rebalance", "protect"]);
 const VAULT_ABI = [
-  "function invest((uint256 investCap,address venue,uint256 protectCap,address safeHaven,uint256 expiry,uint256 nonce) p, bytes sig, uint256 amount)",
-  "function deRisk(uint256 amount)",
-  "function protect((uint256 investCap,address venue,uint256 protectCap,address safeHaven,uint256 expiry,uint256 nonce) p, bytes sig, uint256 amount)",
+  "function invest((uint256 investCap,uint256 protectCap,address safeHaven,uint256 expiry,uint256 nonce) p, bytes sig, address venue, uint256 amount)",
+  "function deRisk(address venue, uint256 amount)",
+  "function rebalance(address from, address to, uint256 amount)",
+  "function protect((uint256 investCap,uint256 protectCap,address safeHaven,uint256 expiry,uint256 nonce) p, bytes sig, uint256 amount)",
 ];
 
 /**
@@ -53,7 +57,7 @@ function createBroker(cfg) {
   async function signVaultAction({ method, args = [], broadcast = false }) {
     if (!CAPABILITY_METHODS.has(method)) {
       record({ capability: "sign-vault-action", method, granted: false, reason: "method not in scope" });
-      throw new Error(`capability denied: "${method}" is not a Guardian vault action (allowed: invest, deRisk, protect)`);
+      throw new Error(`capability denied: "${method}" is not a Guardian vault action (allowed: ${[...CAPABILITY_METHODS].join(", ")})`);
     }
     // Encode the call. populateTransaction sets `to` = the configured vault; we assert it, so the
     // signer can never be tricked into targeting another contract.

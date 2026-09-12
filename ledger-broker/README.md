@@ -19,7 +19,7 @@ agent (daemon) ──POST /capability/sign-vault-action──▶ broker ──si
                   { method, args }  (token-gated)       (scope-enforced, audited)
 ```
 
-The broker will sign **only** a Guardian `invest` / `deRisk` / `protect`, **only** against the one configured vault. It refuses any other method and any other target, and it **never returns the key**. A fully compromised agent still cannot move funds anywhere except through the on-chain-mandated Guardian actions.
+The broker will sign **only** a Guardian `invest` / `deRisk` / `rebalance` / `protect`, **only** against the one configured vault. It refuses any other method and any other target, and it **never returns the key**. A fully compromised agent still cannot move funds anywhere except through the on-chain-mandated Guardian actions.
 
 Three layers of defense stack:
 1. **Key Ring** — the key is encrypted under the owner's Ledger; a host can only decrypt it if it's a member of the device-rooted trustchain (revocable).
@@ -75,7 +75,7 @@ node src/enroll.mjs revoke <vpsPubkey>
 
 ## Honest boundary
 
-The Key Ring makes the secret unleakable **at rest** and gives you revocation. Once the broker decrypts the key into memory to sign, an attacker with code-exec on the *broker* host at that moment could read it — so the broker is the small, hardened surface you protect, not the whole agent. The genuinely unleakable key remains the EIP-712 signing key that never leaves the Flex. graphscout's scope enforcement + the on-chain mandate are what contain a compromised **agent**; the Key Ring + a minimal broker host contain the **secret**.
+The Key Ring makes the secret unleakable **at rest** and gives you revocation. Once the broker decrypts the key into memory to sign, an attacker with code-exec on the *broker* host at that moment could read it — so the broker is the small, hardened surface you protect, not the whole agent. The genuinely unleakable key remains the EIP-712 signing key that never leaves the Flex. the broker's scope enforcement + the on-chain mandate are what contain a compromised **agent**; the Key Ring + a minimal broker host contain the **secret**.
 
 ## Test
 
