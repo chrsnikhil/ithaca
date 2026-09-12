@@ -9,6 +9,8 @@
 **/.arm-mandate.json
 **/policy.json
 **/policy-multi.json
+**/agent-key.enc
+**/agent-key.json
 
 # ─── build / derived ───
 **/.next/

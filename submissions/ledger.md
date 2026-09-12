@@ -26,7 +26,7 @@ Routine invest / rotate / de-risk run autonomously within the signed caps. A **h
 | Device-backed security central | EIP-712 mandate signed on Ledger over USB **and** Bluetooth (DMK); on-chain signer check; Face ID presence gate | Tested |
 | Secrets the agent can't leak | `ledger-broker`: scoped capability, never the raw key, token-gated, audited (4 passing tests) | Tested |
 | Bounded authority that can't be exceeded | On-chain `Policy{investCap, protectCap, safeHaven, expiry, nonce}` + venue/safe-haven allowlists + caps + expiry (26 passing contract tests) | Tested |
-| Key Ring to hosts with no USB | LKRP USB-less enrollment (software-signed `addMember`) + wallet-cli ring, against real SDKs | Implemented; local AES-GCM is the tested default |
+| Secrets on the device-rooted Key Ring | The capability broker runs on `wallet-cli ring`: the agent key is encrypted under the Ledger Key Ring and decrypted through the device to sign scoped actions, never handing out the key. USB-less LKRP enrollment (software-signed `addMember`) extends it to headless hosts. | **Key Ring backend proven live on-device**; USB-less enrollment implemented |
 | Human-in-the-loop for high-risk | Fresh single-use `Escalation` on the Flex → `approveAndProtect`, single-use on-chain | Tested end-to-end |
 
 ## Why "a stolen key can't steal" is the whole point
@@ -64,4 +64,4 @@ The Ledger revokes/rotates the agent at will; the mandate auto-expires. Root of 
 3. **The broker never leaks the key:** hit the `ledger-broker` with an in-scope request (signs) and an out-of-scope one (denied), and show the audit log — "scoped capability, never the raw key; here are the 4 tests proving it."
 4. **Stolen-key demo:** take the agent key and try to send funds to an attacker address — the contract reverts. "A stolen key can annoy, never steal."
 5. **Human-in-the-loop:** trigger a high-risk out-of-bounds evacuation → the Ledger prompts for a fresh single-use Escalation → `approveAndProtect` executes and cannot be replayed. "Ledger approves the dangerous action before any money moves."
-6. **USB-less enrollment:** show LKRP enrolling a headless, Ledger-less host into the Key Ring — and be explicit: "implemented against the real Ledger SDKs; our tested default backend is local AES-GCM."
+6. **Secrets on the Key Ring:** boot the broker on the live Ledger Key Ring backend. `wallet-cli ring init` is approved on the Flex, then the broker decrypts the agent key through the Ledger and signs a scoped action while refusing anything out of scope. USB-less enrollment for headless hosts runs on the same LKRP trustchain.

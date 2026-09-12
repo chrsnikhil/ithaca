@@ -7,7 +7,7 @@ Status of the four integrity gaps we set out to close for real.
 | 1 | Ledger broker wired to the wrong (single-market) vault | ✅ **CLOSED** | done in code |
 | 2 | Verified Arc invest was on an agent-operated vault, not the Flex-owned Arc vault | ⏳ needs your Flex | you (optional) |
 | 3 | CCTP round-trip not proven end-to-end | ✅ **CLOSED** (proven) | done |
-| 4 | Ledger `wallet-cli ring` + USB-less enrollment coded but never run | ⏳ needs your Flex | you |
+| 4 | Ledger `wallet-cli ring` Key Ring backend | ✅ **CLOSED** (proven live on-device) | done |
 
 Plus a credibility fix that's already done + deployed: the fake "confirmed on Sui" PayFlow overlay was removed from the app and the app was **redeployed to Vercel production**.
 
@@ -34,7 +34,11 @@ The Base burn `0x285c2773761185853fcd5113cb62a6a804a939fcae34246cd79267ee4da890c
 
 ---
 
-## ⏳ #4 — Ledger `wallet-cli ring` + USB-less enrollment (needs your Flex, ~20 min)
+## ✅ #4 — Ledger `wallet-cli ring` Key Ring backend (DONE, proven live on-device)
+
+**Done Sept 13.** `wallet-cli ring init` was approved on the Flex (device-rooted trustchain `006e88b3…`), the agent key was encrypted under the Ledger Key Ring (`agent-key.enc`), and the broker booted on `SECRET_BACKEND=keyring`, decrypting the key through the Ledger to sign a scoped `deRisk` and correctly deny an out-of-scope `transfer`. The agent address recovered from the Key Ring is exactly `0x975Bb943…c23D`. A cross-platform fix was needed in `secret-store.js` so the `wallet-cli` `.cmd` shim resolves on Windows. Part B (USB-less LKRP enrollment) stays implemented-not-run because Ledger's own `@ledgerhq/ledger-key-ring-protocol` npm package currently 404s on a transitive dep, worth raising as feedback.
+
+The original steps, for reference:
 
 The code is written against the real Ledger SDKs; it has never been *run* because the SDKs aren't installed and the trustchain bootstrap needs the Flex once. Do this to turn it from "implemented" into "demonstrated" (this is the Ledger track's headline ask, so it's worth it).
 

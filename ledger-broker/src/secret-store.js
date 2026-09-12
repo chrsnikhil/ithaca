@@ -37,12 +37,16 @@ function keyringDecrypt(blobPath, keyName) {
   if (!process.env.WALLET_PASS) {
     throw new Error("keyring backend needs WALLET_PASS in the environment (provisioned by you, never by the agent).");
   }
-  // wallet-cli writes the plaintext to stdout when no -o is given.
+  // wallet-cli writes the plaintext to stdout when no -o is given. On Windows the npm global bin is
+  // a `.cmd` shim, so spawn through a shell there or execFileSync throws ENOENT.
   const out = execFileSync("wallet-cli", ["ring", "decrypt", "-i", blobPath, "--key", keyName], {
     encoding: "utf8",
     env: process.env, // carries WALLET_PASS
-  });
-  return out.trim();
+    shell: process.platform === "win32",
+  }).trim();
+  // the CLI may prepend an advisory tip line; the secret is the last non-empty line.
+  const lines = out.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines[lines.length - 1] || out;
 }
 
 /**
