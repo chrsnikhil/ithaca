@@ -40,3 +40,11 @@ Thumbs.db
 # stray tool binaries
 *.exe
 cloudflared*
+
+# ─── root scratch: planning docs & reference art (kept locally, not in the repo) ───
+/BUILD_PLAN.md
+/SPONSOR_PAINPOINT.md
+/STYLE_GUIDE.md
+/style-preview.html
+/images.jpeg
+/char*.png
