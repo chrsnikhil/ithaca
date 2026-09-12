@@ -70,7 +70,7 @@ Everything here is real and on-chain. Go check every move yourself.
 | **Base vault** (Flex-owned, multi-market) | `0x81AEbF68946D62FDf088579A6F6F2c587015e28A` |
 | **Base autonomous invest tx** | `0x15558852a1a59a6ff24f1fca4d80e5ad0a936fc6bd8efd0f5ce7da1f54df6e9d` |
 | **Arc vault** (Flex-owned) | `0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808` |
-| **Arc autonomous invest tx** | `0xbd3df971d5043df3ca8523cc128dcab95402296600a94098e5a4d1d0dd08932d` |
+| **Arc autonomous invest tx** (Flex-signed, on the Flex-owned vault) | `0x39708f75f31ff36976ab7a983a16136a8f7d5b9ed8a724014baccec4a6455b4d` |
 | **CCTP burn on Base** | `0x285c2773761185853fcd5113cb62a6a804a939fcae34246cd79267ee4da890ce` |
 | **CCTP mint on Arc** (round trip complete) | `0x4ca0230462fbb86c19e6d1d8b6556e1bdcc75f9da7fbd0433d860d54df12951f` |
 | **Ledger Flex owner** (root of trust) | `0xDeC312D5Fe0eaef03048BE83137f87cE7907A7Da` |

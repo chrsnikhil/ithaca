@@ -5,7 +5,7 @@ Status of the four integrity gaps we set out to close for real.
 | # | Gap | Status | Who |
 |---|-----|--------|-----|
 | 1 | Ledger broker wired to the wrong (single-market) vault | ✅ **CLOSED** | done in code |
-| 2 | Verified Arc invest was on an agent-operated vault, not the Flex-owned Arc vault | ⏳ needs your Flex | you (optional) |
+| 2 | Flex-signed invest on the Flex-owned Arc vault | ✅ **CLOSED** (proven on-device) | done |
 | 3 | CCTP round-trip not proven end-to-end | ✅ **CLOSED** (proven) | done |
 | 4 | Ledger `wallet-cli ring` Key Ring backend | ✅ **CLOSED** (proven live on-device) | done |
 
@@ -73,9 +73,9 @@ Capture: the headless host generating its key with no Ledger, the laptop `add` w
 
 ---
 
-## ⏳ #2 — Flex-signed invest on the Flex-owned Arc vault (needs your Flex + Arc USDC)
+## ✅ #2 — Flex-signed invest on the Flex-owned Arc vault (DONE, proven on-device)
 
-Today's verified Arc invest (`0xbd3df97…`) ran on an **agent-operated** vault; the **Flex-owned** Arc vault (`0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808`) is deployed but has no Flex-signed invest yet.
+**Done Sept 13.** A `Policy` was signed on the Ledger Flex over USB (terminal-driven via `@ledgerhq/hw-app-eth` + `hw-transport-node-hid`, no browser needed), recovered to the owner `0xDeC312…`, and the bounded agent deployed 5 USDC into an allowlisted venue on the **Flex-owned** Arc vault (`0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808`). Invest tx `0x39708f75f31ff36976ab7a983a16136a8f7d5b9ed8a724014baccec4a6455b4d`, status success. The proof-vault caveat is gone.
 
 **Honest take:** the Arc story is already strong without this — Flex-owned vault deployed + a real agent invest on Arc + CCTP round-trip proven. So this is **optional polish**, and it's the most effort of the four because the app's arm flow is currently **Base-only** (`guardian/app/lib/vaultMulti.ts` + `useLedgerPolicy.ts` hardcode the Base chainId/vault). To get a Flex signature over the Arc domain (chainId `5042002`, verifyingContract `0x67ef85…`) you need one of:
 

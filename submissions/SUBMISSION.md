@@ -107,7 +107,7 @@ You control all of it by voice. No dashboards, no buttons — you talk to ITHACA
 | **GuardianVaultMulti** | `0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808` | Arc testnet | [arcscan](https://testnet.arcscan.app) |
 | **GuardVaultCCTP** | `0xbEa47f1B7C1252EB2a7C758b27f28ea35ae6c193` | Base Sepolia | [basescan](https://sepolia.basescan.org) |
 | **Base autonomous invest tx** (agent → Base multi-vault) | `0x15558852a1a59a6ff24f1fca4d80e5ad0a936fc6bd8efd0f5ce7da1f54df6e9d` | Base Sepolia | [basescan](https://sepolia.basescan.org) |
-| **Arc autonomous invest tx** (agent → an Arc vault it operates) | `0xbd3df971d5043df3ca8523cc128dcab95402296600a94098e5a4d1d0dd08932d` | Arc testnet | [arcscan](https://testnet.arcscan.app) |
+| **Arc autonomous invest tx** (Flex-signed, Flex-owned vault) | `0x39708f75f31ff36976ab7a983a16136a8f7d5b9ed8a724014baccec4a6455b4d` | Arc testnet | [arcscan](https://testnet.arcscan.app) |
 
 Both autonomous invest transactions were verified via RPC: status **success**, `from` = the bounded agent `0x975Bb9…`.
 
@@ -135,7 +135,7 @@ Both autonomous invest transactions were verified via RPC: status **success**, `
 We lead with what is tested and verified. These are stated precisely so judges who test claims find them true:
 - **The Graph:** the graphscout **MCP server** is invoked by the autonomous daemon. The deployed Vercel app reads The Graph **live** (hosted Subgraph MCP + Gateway GraphQL) and ranks markets with graphscout's **same scoring method** — it does not itself spawn the MCP server. Benchmark numbers are computed **live** against live schema sizes, so they drift slightly run-to-run; the method (~98× average token reduction, 3→1 round-trips, a verdict the raw path never produces), not the exact integer, is the claim.
 - **CCTP:** full round trip proven on-chain. USDC burned on Base (`0x285c2773…`), attested by Circle IRIS, minted on Arc (`0x4ca0230462fbb86c19e6d1d8b6556e1bdcc75f9da7fbd0433d860d54df12951f`). Real USDC crossed Base to Arc, end to end.
-- **Arc invest:** the verified Arc autonomous invest ran on an **agent-operated** vault on Arc. The **Flex-owned** Arc vault `0x67ef85…` is deployed. We do not imply the verified invest went through the Flex-owned vault.
+- **Arc invest:** proven on the **Flex-owned** Arc vault (`0x67ef85…`). The owner signed the Policy on the Ledger Flex, and the bounded agent deployed USDC on Arc (`0x39708f75…`, status success).
 - **Yield venues:** on testnet the venues are `MockYieldVenue` stand-ins. **USYC** (tokenized T-bills) is the Arc-**mainnet** roadmap via the venue-agnostic interface — labeled roadmap, not shipped.
 - **Ledger Key Ring:** the capability broker runs on the live `wallet-cli ring` backend. The agent key is encrypted under the device-rooted Key Ring and decrypted through the Ledger to sign scoped actions, proven on-device. USB-less enrollment (LKRP software-signed `addMember`) is implemented on the same trustchain.
 - **No x402.** There is no x402 payment flow in ITHACA; we do not claim one.

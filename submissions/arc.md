@@ -14,7 +14,7 @@ ITHACA is stablecoin-native onchain finance with a safety reflex. It's a self-cu
 ITHACA is a self-custodial **USDC treasury** with autonomous yield deployment and protection. The same `GuardianVaultMulti` design is **deployed on Arc testnet** (`0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808`). USDC is the unit of account throughout.
 
 > **"Meaningful Arc + USDC use."**
-An **autonomous invest transaction is verified on Arc** (`0xbd3df971d5043df3ca8523cc128dcab95402296600a94098e5a4d1d0dd08932d`, status success, `from` = bounded agent `0x975Bb9…`) on `testnet.arcscan.app`. **Precise scope:** this invest ran on an **agent-operated vault on Arc**; the **Flex-owned** Arc vault `0x67ef85…` is separately deployed. We do not claim the verified invest went through the Flex-owned vault.
+A **Flex-signed autonomous invest is verified on Arc** (`0x39708f75f31ff36976ab7a983a16136a8f7d5b9ed8a724014baccec4a6455b4d`, status success, `from` = bounded agent `0x975Bb9…`) on the **Flex-owned** Arc vault `0x67ef85…`. The owner signed the Policy on the Ledger Flex, and the agent deployed USDC into an allowlisted Arc venue, bounded by that signature and re-checked on-chain.
 
 > **"Advanced programmable money flows — onchain automation, multi-step settlement."**
 The agent runs a full autonomous lifecycle bounded on-chain: **invest** (deploy USDC into an allowlisted venue ≤ cap), **rebalance/rotate** (move between allowlisted venues as risk shifts), **deRisk** (pull funds back to the vault), **protect** (evacuate to the Flex-approved safe haven), and **cross-chain evacuation** via CCTP V2. Every step is re-verified on-chain in the same transaction against caps, allowlists, and expiry.
@@ -60,7 +60,7 @@ On testnet the yield venues are `MockYieldVenue` stand-ins. Because the vault is
 | Item | Value | Network | Explorer |
 |---|---|---|---|
 | GuardianVaultMulti (Flex-owned) | `0x67ef856e1a95be96aa4Cdbd7B0cF348A6C4dD808` | Arc testnet (5042002) | [arcscan](https://testnet.arcscan.app) |
-| Arc autonomous invest tx (agent-operated vault) | `0xbd3df971d5043df3ca8523cc128dcab95402296600a94098e5a4d1d0dd08932d` | Arc testnet | [arcscan](https://testnet.arcscan.app) |
+| Arc autonomous invest tx (Flex-signed, Flex-owned vault) | `0x39708f75f31ff36976ab7a983a16136a8f7d5b9ed8a724014baccec4a6455b4d` | Arc testnet | [arcscan](https://testnet.arcscan.app) |
 | GuardVaultCCTP (burn side) | `0xbEa47f1B7C1252EB2a7C758b27f28ea35ae6c193` | Base Sepolia (84532) | [basescan](https://sepolia.basescan.org) |
 | GuardianVaultMulti | `0x81AEbF68946D62FDf088579A6F6F2c587015e28A` | Base Sepolia | [basescan](https://sepolia.basescan.org) |
 
@@ -77,7 +77,7 @@ The vault is venue-agnostic and already deployed to Arc testnet; the stretch is 
 > ITHACA is a self-custodial USDC treasury that autonomously earns yield and protects itself. It deploys idle USDC into the safest-paying market, rotates as risk shifts, and — when a chain itself becomes the risk — flees cross-chain to Arc over CCTP V2. Every step is bounded on-chain by a Ledger-signed mandate.
 
 **How does this project use Arc / Circle / USDC:**
-> ITHACA is stablecoin-native onchain finance on Arc. The GuardianVaultMulti design is deployed on Arc testnet (0x67ef85…, Flex-owned), and an autonomous USDC invest is verified on Arc (tx 0xbd3df9…, from the bounded agent, on testnet.arcscan.app; executed on an agent-operated Arc vault). Cross-chain rescue uses CCTP V2: GuardVaultCCTP on Base calls ITokenMessengerV2.depositForBurn with destinationDomain 26 (Arc) — the burn is proven on Base and attestation+mint are implemented (full round-trip mint not yet captured). The agent runs advanced programmable money flows — multi-step, on-chain-automated settlement across invest, rotate, deRisk, protect, and cross-chain evacuation — all bounded by caps, venue/safe-haven allowlists, and expiry (26 passing contract tests). Testnet yield venues are mocks; USYC (tokenized T-bills) is the Arc-mainnet roadmap through the venue-agnostic interface. USDC is the unit of account throughout.
+> ITHACA is stablecoin-native onchain finance on Arc. GuardianVaultMulti is deployed on Arc testnet (0x67ef85…, Flex-owned), and a Flex-signed autonomous USDC invest is verified on Arc (tx 0x39708f75…, from the bounded agent, on testnet.arcscan.app): the owner signed the Policy on the Ledger Flex and the agent deployed USDC into an allowlisted venue, bounded on-chain. Cross-chain rescue uses CCTP V2: GuardVaultCCTP on Base calls ITokenMessengerV2.depositForBurn with destinationDomain 26 (Arc), and the full round trip is proven, burned on Base (0x285c2773…) and minted on Arc (0x4ca02304…). The agent runs advanced programmable money flows, multi-step on-chain-automated settlement across invest, rotate, deRisk, protect, and cross-chain evacuation, all bounded by caps, venue and safe-haven allowlists, and expiry (26 passing contract tests). On Arc mainnet the yield venue becomes Circle's USYC (tokenized T-bills) through the venue-agnostic interface. USDC is the unit of account throughout.
 
 **Repo:** https://github.com/chrsnikhil/ithaca
 **Live app:** https://guardian-rho-two.vercel.app
@@ -87,7 +87,7 @@ The vault is venue-agnostic and already deployed to Arc testnet; the stretch is 
 
 ## Demo-video talking points (Circle / Arc)
 1. **Frame it as treasury protection:** "a self-custodial USDC treasury that earns yield and, when a chain becomes the risk, evacuates itself cross-chain to Arc."
-2. **Show the Arc deployment + verified invest:** open `testnet.arcscan.app`, show the Flex-owned Arc vault `0x67ef85…` and the verified autonomous invest tx `0xbd3df9…` — say precisely "this invest ran on an agent-operated Arc vault; the Flex-owned vault is deployed alongside it."
+2. **Show the Arc deployment + Flex-signed invest:** open `testnet.arcscan.app`, show the Flex-owned Arc vault `0x67ef85…` and the Flex-signed autonomous invest tx `0x39708f…`. Say it plainly: the owner signed the Policy on the Flex, the agent deployed USDC, every step bounded on-chain.
 3. **Walk the multi-step money flow:** invest → rotate to a safer venue → deRisk → protect, and show each is re-checked on-chain against caps and allowlists — "programmable money with brakes."
 4. **CCTP cross-chain rescue:** show the burn on Base (`GuardVaultCCTP` `0xbEa47f…`, `depositForBurn`, `destinationDomain 26`) on basescan, then show the matching mint on Arc (`0x4ca02304…`) on arcscan. Real USDC crossed Base to Arc over CCTP V2, a full verified round trip.
 5. **USYC as the mainnet payoff:** "testnet venues are mocks; because the vault is venue-agnostic, Arc mainnet swaps in Circle's USYC — tokenized T-bills — for real yield with no contract rewrite. That's the roadmap."
