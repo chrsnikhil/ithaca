@@ -24,7 +24,6 @@ export const DEPLOYMENTS = {
       { id: "aave", name: "Aave v3", venue: "0x6dB0bA243F5e9713634B5D0706C7b28f83438Afb", apr: 5.0 },
       { id: "compound", name: "Compound", venue: "0x37Ac7B5b8a0a045496936A82D2c78dDFF125ca6E", apr: 6.0 },
     ],
-    explorer: "https://testnet.arcscan.app",
   },
   baseSepolia: {
     chainId: 84532,

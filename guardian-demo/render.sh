@@ -45,7 +45,7 @@ import fs from "node:fs";
 const [DBG,PAGEURL,FRAMES,FPS,W,H,HOLD,MAXS] = [
   +process.env.DBG, process.env.PAGEURL, process.env.FRAMES, +process.env.FPS,
   +process.env.W, +process.env.H, +process.env.HOLD_LAST, +process.env.MAXS];
-const LAST=11, sleep=ms=>new Promise(r=>setTimeout(r,ms));  // R14 — 11 scenes
+const LAST=11, sleep=ms=>new Promise(r=>setTimeout(r,ms));  // R27 — 11 scenes
 let pg=null;
 for(let i=0;i<150&&!pg;i++){                       // wait for CDP + a page target
   try{const l=await(await fetch(`http://127.0.0.1:${DBG}/json/list`)).json();

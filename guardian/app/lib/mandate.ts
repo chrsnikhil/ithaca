@@ -30,3 +30,21 @@ export function saveMandate(m: StoredMandate) {
 export function clearMandate() {
   try { localStorage.removeItem(KEY); } catch {}
 }
+
+// "Link this device": the Flex can only sign on desktop (iOS blocks WebHID/Web-Bluetooth), so to run
+// the armed flow on a phone we carry the already-signed mandate over in a URL param. Desktop makes a
+// link `…/?m=<base64(mandate JSON)>`; opening it on the phone imports the mandate into this device's
+// localStorage, then strips the param from the URL. The signature is the capability (not the private
+// key), so this only hands the phone the same bounded authority the Flex already approved.
+export function importMandateFromURL(): boolean {
+  try {
+    const u = new URL(window.location.href);
+    const enc = u.searchParams.get("m");
+    if (!enc) return false;
+    const obj = JSON.parse(decodeURIComponent(escape(atob(enc)))) as StoredMandate;
+    if (obj?.policy?.expiry && obj.signature) localStorage.setItem(KEY, JSON.stringify(obj));
+    u.searchParams.delete("m");
+    window.history.replaceState(null, "", u.pathname + (u.search || "") + u.hash);
+    return true;
+  } catch { return false; }
+}

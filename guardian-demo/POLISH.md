@@ -1022,7 +1022,366 @@ Three.js world. Iterate with Fable rounds; review each round against the bar bel
     .gxh/.gxf/.cfoot CSS rules remain defined (DOM no longer references them); SCRIPT.md still
     says Guardian if it is ever reused for narration.
 
-## FINAL QA — R5 (shots in .shots/final_s01…final_s10)
+- **R21** (2026-09-12): DONE — the deck's second scene INSERTION: a new **scene 7 · LIVE DEMO**
+  between THE MANDATE and AUTONOMOUS — the real phone capture (`assets/livedemo.mp4`, portrait
+  1080x1888, 86.2s) plays full-height, contain-fit (~606px wide) in a thin rounded phone bezel
+  (#demoPhone, 1px white border + faint cyan halo) over an intentionally EMPTY 3D stage; the
+  deck is now **12 scenes, ~5:22 in ?auto**. Every pre-existing scene's content/staging is
+  byte-identical — only positions 7-11 shifted to 8-12.
+  - **The scene**: persistent `<video id=demoVid muted playsinline preload=auto>` in the body
+    (buffers from page-open); it rides the deck's ONE scene-activation path — renderSlide →
+    applyLayers, where `LAYERCFG[6]={demo:1}` shows the layer and plays from `currentTime=0`;
+    ANY exit pauses + rewinds, so re-entering restarts. Left column fills the side space:
+    "LIVE ON BASE SEPOLIA" (LIVE in the semantic cyan) + 3 talking points ("Talk to it → it
+    sets the policy" / "Sign once on the Ledger Flex" / "Autonomous deploy, verified on-chain"),
+    Helvetica Bold with the deck's cyan left-border rows, staged on data-at 0.4-2.7. Layer sits
+    at z4 (above vig/grain so the recording stays crisp/ungraded, under the z5 HUD); DUR 88s in
+    ?auto, live the arrow advances. In ?capture the video is scrubbed to the virtual clock
+    (layerStep) instead of wall-time playback, so render.sh stays deterministic.
+  - **The renumber (all 12-length, verified)**: SLIDES/DURS/CAPS/FOGD/LAYERCFG/FLASHC/SHOTS
+    +1 entry at index 6; addSet 6-10 → 7-11 with their `LOOPS[n]` phase reads; layerStep flash
+    beats 6/7/8 → 7/8/9; slide `n:` 007-011 → 008-012; digit-jump `0` now = scene 11 (PROOF, was
+    10); progress dots auto-derive → 12; notes panel #1…#12 / rests-on-12 (~5:22); render.sh
+    `LAST=12` + ETA base 324s; shot.sh usage 1-12.
+  - **Codec fix (capture-caught)**: livedemo.mp4 arrived HEVC 10-bit (`hevc/yuv420p10le`) —
+    Chrome reported playback but painted BLACK frames headless (and headed playback would
+    depend on the machine's HEVC hw extensions: a live-stage black-rectangle risk). Re-encoded
+    in place to H.264 8-bit (`libx264 crf19 yuv420p +faststart`, 47.8MB → 9.8MB, video stream
+    86.23s/2587f intact; the source's own audio truncation at 67.6s carried over — irrelevant,
+    the element is muted). Original kept as `assets/livedemo_hevc_orig.mp4`.
+  - **Verified (screenshots, .shots/)** — `r21_scene7_livedemo` (real-time CDP capture: app
+    frame ~3.2s in, avatar + GUARDIAN UI legible inside the bezel, left column landed, HUD
+    label "// 07 · LIVE DEMO" + 007, dot 7/12 lit); `r21_scene6_mandate` and
+    `r21_scene8_autonomous` (both neighbors pixel-faithful post-shift: mandate table + Flex GLB;
+    ticker + tx chip + market columns, label // 08 · 008). CDP virtual-clock run: ?auto=1
+    advances HOOK → … → LIVE DEMO (held 88s) → … → CLOSE, all 12 in order, dots tracking,
+    rests on 12 at t=321s. All 6 addresses/txs + the live URL grep-identical (1 hit each,
+    before and after). Inline script `node --check` clean.
+  - **Honest residuals**: shot.sh's `--virtual-time-budget` does not advance media time, so a
+    scene-7 still through shot.sh can catch the video before first paint (black phone screen) —
+    the H.264 frame 0 itself shows the app; use a real-time capture for scene-7 stills; the
+    mp4's audio track ends at 67.6s (source artifact, muted anyway); in ?capture the per-frame
+    seek makes scene 7 render slower than the 3D scenes (render.sh only); scene-7 free-look
+    drag orbits an empty stage (harmless); SCRIPT.md not updated for the new scene order.
+
+- **R23** (2026-09-12): DONE — round 1 of the 5-round detail+performance push: per-scene
+  **ENVIRONMENTS** (no 3D scene reads as flat black any more) + a **P-toggled PERF HUD**.
+  (Two in-code micro-passes since R21 were never logged here: R22 = scene-7 de-haze + the
+  3D-render gate while the video plays; the scene-7 audio unmute is tagged R23 in code.)
+  - **ENV, the system** (`makeEnv`, after `dustGrid`): two shared, GPU-trivial layers behind
+    every 3D scene. (1) a **gradient SHELL** — ONE shared open BackSide cylinder (r85, h170)
+    wearing a baked vertical gradient: a faint horizon glow band in the scene's semantic tint
+    dying to the deck black above and below. Painted in display values, texture tagged
+    `SRGBColorSpace` (hardware sRGB decode → the POST comp's manual encode returns them
+    exactly; 8-bit sRGB steps stay perceptually even in the darks — no banding), `fog:false`
+    (the shell IS the world beyond the fog, so s2's .024 air can't erase it). Looks cached —
+    scenes sharing a tint share one texture+material (cyan/blue/red/void/harbor). (2) a
+    **STAR/DUST field** — 260–440 soft additive Points (the shared GLOW map) on a far ring
+    (r34–76), static by design: parallax comes free from the camera moves, zero per-frame JS.
+    Whole system = exactly TWO extra draw calls on the active set; only the active set draws.
+    **Scene 7 (LIVE DEMO) untouched** — empty stage, DOM video, R22 gate all byte-identical.
+  - **Per scene (deck numbering)** — s1 HOOK calm cyan air + stars · s2 DATA OVERLOAD cold
+    blue data-void, densest far dust (420) · s3 NO SAFETY NET the red glow lives DOWN in the
+    pit (`look:void`, band at .80) + sparse embers reaching below the rim · s4 VOICE AI-blue
+    behind the ghost wall · s5 SCOPE light cyan, sparsest stars (280 — the data-noise field
+    is already dense) · s6 MANDATE cyan mandate room · s8 AUTONOMOUS money-in-motion blue
+    behind the market skyline · s9 CAN'T BE ROBBED low red unease · s10 SAFE HARBOR the
+    SPLIT room: red storm-glow behind Base (−x, u.75) / cyan haven-glow behind Arc (+x,
+    u.25) on one 512-wide wrap, stars only above the sea line · s11 PROOF calm cyan ·
+    s12 CLOSE the starriest, brightest sky of the deck (440 @ .42) — the homecoming night.
+  - **PERF HUD** (`#perf` + `perfToggle`): **P** toggles a corner chip — smoothed **FPS ·
+    frame-ms · draw calls**, updated ~2×/sec, JBMono, bottom-right above the hint. OFF by
+    default; works with `?chrome=0` (dev tool, not deck chrome); **never under `?capture`**
+    (guarded at the key AND the sampler — render.sh stays byte-deterministic). While on,
+    `renderer.info.autoReset` is off and `frame()` resets info itself, so the count covers
+    the WHOLE frame (scene + all 4 bloom passes), not just the last composite; on scene 7
+    the R22 gate holds it at 0 — the honest number. Key legend updated in the header
+    comment, the on-screen hint (`P fps`) and the notes panel.
+  - **Verified (screenshots, .shots/)** — `r23_s01_hook` 8, `r23_s03_cliff` 10,
+    `r23_s08_auto` 13.5, `r23_s12_close` 9.5 (all four: real depth, heroes untouched,
+    nothing competing) + the three risk scenes: `r23_s02_wall` (shell reads through the
+    .024 fog), `r23_s06_mandate` (Flex GLB + camera rig pixel-faithful over the new depth),
+    `r23_s10_harbor` (split tint behind ring + storm). `r23_perf_hud` = chip live over
+    scene 8 ("2 FPS · 435.5 ms · 510 calls" on swiftshader). CDP probe: perf chip
+    off-by-default (display:none, empty) → P shows live numbers → P hides again. Real-time
+    `?auto=1` run: #2→#12 land exactly on the DUR schedule (#12 at 314s ≈ 309 + 5s poll),
+    rests on 12, ZERO console errors (also proves all 12 sets built clean). Facts 7/7
+    grep-identical before+after (6 addresses/txs + URL, one hit each). `node --check` clean.
+  - **Honest residuals**: real fps is UNMEASURABLE headless (software GL ≈2fps) — the user
+    must press P on the live GPU to read true numbers; measured ~505–510 draw calls/frame on
+    s8 is PRE-EXISTING cost (every obox = 2 meshes, every comet = 3 sprites — the cast alone
+    is hundreds of calls) — instancing the voxel cast is the obvious later-round win; the
+    perf chip overlaps the notes panel when notes are open (dev tool, benign); under ?cast
+    the chip freezes at its last sample (CASTQ's early return skips the sampler); s4/s5/s9/
+    s11 backdrops not individually screenshotted this round — they reuse the exact cached
+    looks verified above and the sweep showed zero set-build errors.
+
+- **R24** (2026-09-12): DONE — round 2 of the detail+performance push: the HERO ASSETS gain
+  real machining while the deck's draw calls are CUT roughly in half. The enabler is the
+  **VOXEL BATCHER** (`inkMat`/`bakeGeo`/`mergeParts`/`voxBatch`, after `ocyl`): every STATIC
+  voxel inside one rigid group now bakes into ONE merged vertex-colored MeshToonMaterial
+  mesh + ONE merged BackSide ink shell per outline color (vertex colors ride the same
+  sRGB→linear path material colors do → pixel-identical toon shading; ink materials are
+  never mutated → one shared material per outline color deck-wide; each merged fill keeps
+  its OWN material so the scene-6 traverse dim still hits each mesh exactly once). Only
+  what animates (eyes, lamps, pips, red accents, the wheel, the dial) stays a live mesh.
+  - **Per asset**:
+    · **VAULT** (`makeVault`) — rebuilt on the batcher (~65 meshes → ~12 draws) AND
+      machined: plinth corner feet, 3 crown ribs, recessed door-plate seams, a slatted
+      side intake grille, the keypad's conduit run + clamps, crossed back braces, a
+      4-bolt ring on the door boss; the 8 corner studs merged to ONE mesh; the wheel
+      (rim+spokes) merged to 2 draws. Footprint/anchor/API byte-compatible.
+    · **GUARDIAN** — batched per rigid group (~140 draws → ~27) + axle end caps, shin
+      plate screws, side-plate/backpack/head-panel bolts, pauldron rivets, a chin seam.
+    · **AGENT** — batched (~115 → ~24) + thigh pistons, waist-ring notches, sternum
+      screws, yoke bolts, ear-pod rim lips, chin notches, calf vents.
+    · **INTRUDER** — batched (~120 → ~27) + belt pouches, back cloak ribs, hood-flap
+      stitching; the red smoulder accents, eyes and swarm untouched (threat = contrast).
+    · **CAGE** (`makeCage`) — scene 9's one-off depth kit (inner counter-rotating shell,
+      additive facet skin, vertex studs) PROMOTED into makeCage, hidden by default:
+      scene 9 just switches it on (same drives, byte-equal look), the MANDATE cage now
+      wakes it with the snap, AUTONOMOUS runs a faint counter shell.
+    · **SCOPED KEY** (s6+s9) — a lit blue octahedron core inside the wire cut + a fine
+      spinning collar: machined, not schematic. (The stolen GHOST copy stays bare.)
+    · **MARKET TOKENS** (s5) — a 36-tooth REEDED EDGE merged to one mesh per token,
+      riding rimM so the lock flare/loser dim light the reeding with the rim.
+    · **MARKET COLUMNS** (s8) — skyline trim (4 corner ribs + 4 floor bands + roof lip)
+      merged to ONE mesh per pillar on one shared material: engineered towers.
+    · **HARBOR GATES** — s8's landing torus gains 10 merged mooring clamps on hPadM;
+      s10's USYC gate gains 12 mooring cleats + a fine outer guide band on torusM, so
+      the settle flare lights the machining exactly like the rings.
+    · **LEDGER (s6)** — deliberately untouched: the Flex GLB is the real product shot;
+      the mandate's craft went into the key, cage and vault it stands beside.
+  - **DRAW CALLS** (P HUD, whole frame incl. 4 bloom passes; R23 baseline ~510 on s8):
+    s8 AUTONOMOUS **~225–235** (−54%) · s2 wall 278 (now the deck max) · s9 robbery 117 ·
+    s10 harbor 143 · s5 scope 137 · s6 mandate 81 · s12 close 75 · s4 65 · s3 59 · s1 49 ·
+    s11 42. `r24_perf_hud` = chip live over s8 ("6 FPS · 167.2 ms · 235 calls", software GL).
+  - **Verified (screenshots, .shots/)** — cast turntables `r24_cast_guardian/agent/
+    intruder/vault` (merged rigs pixel-faithful, identity intact, new greebles read as
+    engineering); in-scene `r24_s01_hook`, `r24_s05_emblems` (reeded edges legible after a
+    +.02r proudness fix), `r24_s06_mandate` (cage depth + machined key + Flex GLB intact),
+    `r24_s08_markets`/`r24_s08_haven` (tower trim + clamps), `r24_s09_thief`/`r24_s09_revert`
+    (cage kit + key), `r24_s10_harbor` (cleated gate), `r24_s12_close`. CDP hash-sweep of
+    all 11 3D scenes: zero console errors. Real-time `?auto=1` run: all 12 on the DUR
+    schedule, rests on 12, zero console errors. Facts 7/7 grep-identical (6 addresses/txs
+    + URL, 1 hit each). Scene 7 (LIVE DEMO) byte-untouched. `node --check` clean.
+  - **Honest residuals**: true fps still unmeasurable headless (software GL) — but at
+    ~225 max calls the 120fps budget now has ~2× headroom vs R23; s2's dashboard WALL
+    (112 per-panel meshes) is now the deck's call ceiling (278) — per-shell merged wall
+    or instanced panels is the obvious R5 target, along with the s2/s5 storm/noise
+    instancing already in place; the R24 machining is tuned at deck distance — extreme
+    ?cast close-ups show tiny seams intersecting (by design, voxel language); reeded
+    edges brighten with rimM on the lock flare (intended, verified not blown out).
+
+- **R25** (2026-09-12): DONE — round 3 of the detail+performance push: the R24 CLUTTER AUDIT
+  (step 1, mandated) and CONNECTIVE TISSUE between hero and backdrop (step 2).
+  - **AUDIT (before anything was added)** — all 8 R24-touched scenes re-screenshotted at
+    their hero beats (`r25a_s03_void/sprint · s05_lock/volley · s06_snap/flex · s08_flow/
+    settle · s09_revert/grab/thief · s10_cross/settle · s11_proof · s12_close`): **verdict
+    CLEAN, zero dial-back.** The machining reads as precision engineering at deck distance —
+    silhouettes intact, no asset noisy or busy. (The dark box by s8's SCOUT ticker row was
+    checked against `r24_s08_haven`: pre-existing — the haven disc edge-on behind the
+    translucent DOM row, not R24 clutter.)
+  - **CONNECTIVE DETAIL, per scene** (all in the existing glow-sprite/line language, all
+    build-time rng → runtime pure functions of (t,ph), zero per-frame allocations, only
+    the active set animates; scene 2 — the 278-call ceiling — deliberately got NOTHING):
+    · **s1 HOOK** — the calm breath: 6 cyan motes rise slowly off the guarded safe
+      (`makeRisers`, the new shared helper after hideMotes) — bookends s12's night. +6 draws.
+    · **s4 VOICE** — the words pour IN: an 8-mote cyan spiral drains into the orb, gated
+      by the YOU speech envelope only (the reply already answers through waveform + rings;
+      no mirror stream — one direction, one meaning). +8 draws while YOU speaks, else 0.
+    · **s5 SCOPE** — the READ made visible: 6 sample-motes stream from the market under
+      the reticle back into the agent (graphscout pulling live risk out of the wall),
+      following the reticle's own sweep schedule (moon→aave→comp with the same eased
+      handoffs as scopeStep), dying at lock. +6 draws during the sweep.
+    · **s6 MANDATE** — the boundary, DRAWN: a still ticked survey ring (r3.42 circle +
+      36 merged tick marks, majors every 90°) stays stamped on the floor under the cage
+      after the snap pulse dies — the mandate reads as a measured perimeter. +2 draws.
+    · **s8 AUTONOMOUS** — yield, visible: 7 cyan motes tick UP off the invested market's
+      roof (money working), re-parking Compound→Aave on the ROTATE beat (same eased clock
+      as the rotation) and dying with the evacuation window. +7 draws while invested.
+    · **s9 ROBBERY** — the exfil VECTOR: a thin red intent line grows from the boundary
+      wall toward the OUTSIDE address while the thief flings — the REVERT kills it
+      mid-air, so denial and destination read in one glance. +1 draw during the surge.
+    · **s10 HARBOR** — approach lights: 3 beacons on the last stretch of the CCTP arc
+      blink in sequence TOWARD the gate (landing guidance), lit once the crossing runs.
+      +3 draws.
+  - **DRAW CALLS** (P HUD over CDP, whole frame incl. bloom, two samples/scene): s1 55 ·
+    s2 **278 (deck max, unchanged)** · s3 74–155 · s4 65–181 (ghost-wall beat, pre-existing)
+    · s5 147–164 · s6 59–72 · s7 **0** (R22 gate intact) · s8 241–243 (R24 ~235; +7 = the
+    risers) · s9 116–197 · s10 52–140 · s11 42 · s12 75. Ceiling unmoved; every scene keeps
+    R24's ~2× headroom vs the R23 510 baseline.
+  - **Verified** — `node --check` clean on the extracted inline script; new-detail shots
+    `r25_s01_breath · s04_intake · s05_readstream · s06_ring(+zoom crop: ticked ring
+    confirmed on the floor) · s08_earn/rotate · s09_exfil · s10_beacons`; real-time
+    `?auto=1` CDP run: all 12 scenes land on the DUR schedule, rests on 12, ZERO console
+    errors/exceptions; facts 7/7 grep-identical before+after (6 addresses/txs + URL, one
+    hit each); scene 7 (LIVE DEMO) byte-untouched (`addSet(6,()=>{return()=>{}})` +
+    empty-stage path verified, gate still holds 0 calls).
+  - **Honest residuals**: real fps still unmeasurable headless (software GL, 3–8 fps —
+    the user must press P on the live GPU); the new motes are deliberately whisper-quiet
+    (op .10–.5 envelopes) — they read as ambient life in motion but are near-invisible in
+    a single still (intended: restraint beat decoration); s2's 278-call dashboard wall
+    remains the obvious R5-round instancing target (per-shell merge or instanced panels),
+    and the s2/s5 noise fields after that.
+
+- **R26** (2026-09-12): DONE — round 4 of the detail+performance push: lighting, material and
+  color COHESION. A deliberately surgical round — the before-audit (8 scenes re-screenshotted
+  first, `.shots/r26pre_*`) showed a deck already clean, so R26 is uniform/color work ONLY:
+  zero new geometry, zero new lights, zero new draws.
+  - **BLOOM, made hue-fair** (the real find of the round): the POST threshold keyed on pure
+    luma — cyan's luma weight (.72 G-heavy) let safe-cyan bloom ~10× richer than the SAME
+    energy of danger-red (.21) or money-blue (.07), so the deck's two other semantic hues
+    always read flatter than cyan. The knee now blends **35% max-channel** into the luma
+    (`l=mix(l,max(c.r,max(c.g,c.b)),.35)`) and rises `.20/.80 → .22/.82`: red flares (REVERT,
+    depeg) and blue flows (CCTP beacons, comet streams, the scoped key) bloom in their own
+    hue at cyan's richness, while neutral WHITES come out a hair TIGHTER — the anti-haze
+    direction. Verified: s10's beacon trail reads jewel-like (was flat dots), the s6/s9 key
+    core carries a real blue halo, s2's white dashboard wall is unchanged-to-crisper, s12's
+    three lights are tighter cores. No scene reads hazier.
+  - **SEMANTIC RIM LIGHT** (`RIMTINT[12]` + one `rimL.color.lerp` next to the fog smoothing):
+    the R1c film rim (one global 0xaac3ff blue-steel forever) now carries each scene's
+    meaning — **cyan-steel** 0x9fd8e6 for the safe rooms (s1/s5/s6/s11/s12), **blue-steel**
+    0x9caeff for AI/flow (s2/s4/s8), **red-steel** 0xe0a396 for danger (s3/s9), the base
+    steel for the split harbor (s10) and the empty demo stage (s7). Every lit hero (cast,
+    vault, tokens, towers, gates) wears a quiet edge in its room's tint and separates from
+    the R23 shells; same smoothing constant as the fog so cuts grade over ~1.5s. `?cast` QA
+    keeps the neutral rim (frame() returns before the lerp).
+  - **WARM KEY ON THE SAFE** (`makeVault` pl 0xffffff → 0xffeedd): the vault's own point
+    light runs whisper-warm against the cool rim — the classic warm-key/cool-rim split, and
+    it lands the palette rule "warm/neutral = structure": the safe is the home the money
+    returns to. Same position/intensity, so it reads as grading, not a second source. The
+    global key, fill, hemi and the Flex product rig stay white (Ledger stays neutral).
+  - **PALETTE DISCIPLINE**: scene 9's OUTSIDE cross was the one off-palette prop left —
+    muddy 0xcc6666 → the deck's danger **RED** (opacity .55→.48 keeps its screen value).
+    Audited and deliberately KEPT: the s10 storm's fire-family oranges (ff8a70/ff7a5c —
+    red-family heat, not decoration), the USDC coin's brand blues, the agent's pale-blue
+    volley tracers (R12), all canvas-text reds/teals.
+  - **DRAW CALLS** (P HUD over CDP, whole frame incl. bloom, two samples/scene): s1 52-54 ·
+    s2 **254-274 (deck max, unchanged)** · s3 55-78 · s4 99-165 · s5 164 · s6 59 · s7 **0**
+    (R22 gate intact, 60fps decode-only) · s8 236-241 · s9 116-132 · s10 50 · s11 42 ·
+    s12 75. **Delta vs R25: zero** — every change is a uniform, a shader constant or a
+    material color.
+  - **Verified** — `node --check`-equivalent (vm.Script) clean on the extracted inline
+    script; after-shots `r26_s01/s03/s05/s06/s08/s09/s10/s12` + targeted A/B beats
+    `r26_s02_wall` (white-heavy: no haze), `r26_s04_voice`, `r26_s05_lock`, `r26_s06_flex`
+    (matches the R25 canonical frame + richer key glow) + `r26_perf_hud`; CDP sweep of all
+    12 scenes: ZERO console errors (only the pre-existing three.js r150 deprecation
+    warning, present since R1); perf chip off-by-default → P live → P off again; facts 7/7
+    grep-identical before+after (6 addresses/txs + URL, one hit each); scene 7 set
+    byte-identical (`addSet(6,()=>{return()=>{}})`).
+  - **Honest residuals**: real fps and TRUE bloom appearance still need the live GPU —
+    swiftshader renders the same math but the half-float blur chain can differ subtly in
+    the darks (the user should eyeball s9/s10 red/blue halos live and press P for real
+    numbers); shot.sh's virtual-time budget lands on slightly different beats run-to-run
+    (mp4 preload consumes budget under load), so before/after pairs compare LOOKS, not
+    identical frames — the ?capture clock remains the byte-deterministic path; the rim
+    lerp means a scene entered mid-cut carries ~1.5s of the previous room's tint
+    (intentional — reads as grading); s2's 278-call wall instancing remains the R5-round
+    target.
+
+- **R27** (2026-09-12): DONE — the **LIVE DEMO scene is REMOVED**: the real demo video is
+  being stitched in externally during the edit, so the deck no longer contains or references
+  it at all. R21 + R22 are reversed; the deck is back to **11 scenes (~3:54 in ?auto)**:
+  1 HOOK · 2 DATA OVERLOAD · 3 NO SAFETY NET · 4 VOICE · 5 THE SCOPE · 6 THE MANDATE ·
+  7 AUTONOMOUS · 8 CAN'T BE ROBBED · 9 SAFE HARBOR · 10 PROOF · 11 CLOSE. **Every R23-R26
+  improvement on the surviving scenes is preserved** (env shells/stars, hero machining +
+  voxel batcher, connective motes/lines, hue-fair bloom + semantic rim + warm vault key,
+  the P perf HUD).
+  - **Removed**: index 6 from every per-scene array (SLIDES/CAPS/DURS/FOGD/LAYERCFG/FLASHC/
+    SHOTS/RIMTINT — all back to length 11; LOOPS=DURS follows); the empty demo-stage
+    `addSet(6)` with sets 7-11 shifted down to 6-10 (their `LOOPS[n]` reads renumbered);
+    the `#demoWrap/#demoPhone/#demoVid` DOM + its whole CSS block (`.demoSide/.dsh/.dsl`);
+    the `assets/livedemo.mp4` reference (file left on disk); the applyLayers `demo:1`
+    play/pause/rewind path + the `if(CAP)demoVid.muted` guard; the layerStep `cur===6`
+    ?capture scrub branch; the R22 `demoDrawn/demoHold/draw3d` render gate — `frame()`
+    draws normally every frame for all scenes again, and the perf sampler reads
+    `renderer.info.render.calls` unconditionally.
+  - **Renumbered**: slide `n:` 008-012 → 007-011 with their "// NN · NAME" HUD labels;
+    layerStep flash beats 7/8/9 → 6/7/8; digit-jump `0` = scene 10 (PROOF) again; notes
+    panel `#1…#11` / rests-on-11 (~3:54); header changelog (R21/R22 entries dropped, R27
+    added, "11 cinematic scenes"); render.sh `LAST=11` + ETA base 236s + comments;
+    shot.sh usage 1-11.
+  - **Verified**: inline script compiles clean (`new vm.Script` on the extracted block);
+    all 8 per-scene arrays measured at length 11; live-DOM probe: **11 progress dots**,
+    zero `<video>` elements; `demoVid/demoWrap/livedemo` grep-clean in code; facts 7/7
+    grep-identical before+after (6 addresses/txs + URL, one hit each). Screenshots
+    (.shots/): the seam `r27_s06_mandate` (// 06 · 006, table + Flex GLB + cage) and
+    `r27_s07_autonomous` (// 07 · 007, ticker + tx chip + haven gate) prove the renumber
+    is clean, plus `r27_s01_hook · s05_scope · s09_harbor · s11_close` — R23 environments,
+    R24 machining, R25 beacons and the R26 grade all intact, dots tracking 11.
+  - **Honest residuals**: `assets/livedemo.mp4` + `assets/livedemo_hevc_orig.mp4` remain on
+    disk by request (unreferenced); SCRIPT.md still describes the older narration order;
+    scene numbers in R21-R26 entries above refer to the historical 12-scene layout.
+
+- **R28** (2026-09-12): DONE — the SMOOTHNESS pass (120fps target): **every decorative
+  per-asset glow-sprite/halo QUAD is REMOVED** — big transparent additively-blended quads
+  were the deck's fillrate/overdraw ceiling — the bloom post pass is trimmed hard, one
+  remaining static merge landed, and the hot loops now allocate nothing. Content, story,
+  beats, timing, camera and all controls untouched (11 scenes, ?auto/?chrome/?capture/
+  P HUD/render.sh/shot.sh intact).
+  - **GLOW REMOVED (P1)** — deleted outright or left as never-added API stubs (zero draws,
+    zero fillrate; property writes still land harmlessly where scenes drive them):
+    · **vault** — the s*2.7 behind-halo (biggest single quad in the deck, one per vault ×5
+      scenes), the door-seam halo, the keypad-lamp halo (the additive seam torus and the
+      blinking lamp chip carry those reads now);
+    · **cage** — the r*3.1 boundary halo in every cage scene (s6/s7/s8);
+    · **cast** — guardian eye halos ×2, heart halo, antenna-tip halo; agent visor halo +
+      chest-core halo; intruder eye-slit halos ×2 (eyes/heart/pips stay bright MeshBasic);
+    · **sparks** — the per-spark 2.3u halo (a burst used to stack up to 70 additive quads);
+    · **markets** — the three r*2.7 token halos (s5) — compensated with a touch more
+      emissive on body (.02→.035 base) and rim (.17→.23 base): the "lit" read at zero cost;
+    · **towers** (s7) — the 1.6u rooftop glow quads become SMALL additive lamp spheres
+      (same beat-driven opacity, same beacon read, a fraction of the fill);
+    · **harbor gates** — s7's 2.9u gate aura + 3-quad beam column (hIn emissive .34→.40
+      comp); s9's USYC heart quad (torus emissive .3→.34 base, settle .2→.24);
+    · **keys** (s6+s8) — the 1.2-1.3u key halos (lit octahedron core .34→.45);
+    · **orb** — the r*3.4 core glow quad (4.6-5.1u in voice/proof!) becomes a SMALL
+      additive core sphere (child index kept — the voice tint still lands);
+    · **atmosphere quads** — s3's void mist (4× 6-9.4u), s4's 3.6u pedestal + 5.4u speech
+      aura, s8's 3.1u threat rim + 3.4u impact flash, s9's 7 storm-haze quads (3.4-6u) +
+      the 8.5u storm core. Where a removed piece sat mid-rng-sequence (s3 mist, s9 haze)
+      the cursor is burned (20/42 calls) so every downstream scatter is byte-identical.
+    · **KEPT deliberately** (they ARE content, small quads): comet/tracer heads+streaks,
+      the R25 connective motes (breath/intake/read/yield/beacons), embers/spray/coins,
+      s10 drift, s11's three sponsor lights, the shared star-field Points (1 draw), and
+      all emissive materials.
+  - **BLOOM TRIMMED (P2)** — with the halos gone the threshold field is nearly empty, so
+    the blur chain drops **1/4 → 1/8 res** (4× fewer blurred pixels/frame) and the
+    composite weight drops **.5 → .3**: a whisper halo on real emissive reads, and the
+    anti-haze direction the deck already wanted. The R26 hue-fair knee is untouched;
+    full-res MSAA scene target + composite stay (they are the AA and the grade).
+  - **DRAW CALLS + CPU (P3)** — R24's voxel batcher had already merged the cast/vault/
+    tower rigids; this round: s3's 5 rail posts + 4 rails merge to ONE mesh on railM
+    (stubs stay live — they swing). Per-frame allocation kill: streamMotes/streamComets
+    now `getPoint/getTangent` into scratch vectors (42 Vector3/frame in s9 alone),
+    s7's scout-ping and s9's rider path likewise, s8's thief hover/orbit vectors and
+    s6's signature-path array are scratch now. rAF confirmed uncapped; only the active
+    set updates + renders (R9 gate intact).
+  - **DRAW CALLS, before → after** (P HUD over CDP, same beats, whole frame incl. bloom,
+    two samples): s1 55/53→**48/46** · s2 268/326→**259/261** · s3 58/60→**42/44** ·
+    s4 70/44→**62/38** · s5 137/137→**128/128** · s6 83/83→**72/72** · s7 211/176→
+    **199/164** · s8 117/116→**104/103** · s9 156/101→**130/93** · s10 42/42→**38/38** ·
+    s11 75/75→**66/66**. Frame-time on software GL (a fillrate proxy) fell ~8-18%
+    everywhere (s6 171→147ms · s7 145→120 · s3 120→97 · s10 97→87); the real-GPU win is
+    larger still, since what was removed is pure additive overdraw + a 4×-lighter blur
+    chain. TRUE fps must be read by the user on the live GPU via **P**.
+  - **Verified** — `new vm.Script` compile clean on the extracted inline script; CDP sweep
+    of all 11 scenes with the P HUD live: ZERO exceptions/console errors; facts 7/7
+    grep-identical before+after (6 addresses/txs + URL, one hit each); 13 screenshots
+    (.shots/): `r28_s01_hook · s02_wall · s03_sprint/s03_dive (motion pair 1) ·
+    s04_voice · s05_lock · s06_mandate · s07_invest/s07_settle (motion pair 2) ·
+    s08_revert · s09_crossing · s10_proof · s11_close` — every scene still reads dark-
+    premium, not flat: emissives, line-work, env shells and the R26 rim carry the depth.
+  - **Honest residuals**: the look IS drier up close — the most visible losses are s8's
+    intruder (no red aura behind the swarm; edges/slits/accents still strobe) and the
+    vault's soft cyan aura in s1/s2 (the seam ring + warm key still lift it) — judged
+    acceptable against the smoothness mandate, and the user should eyeball s8 live;
+    s2's 112-panel dashboard wall (~260 calls) remains the draw-call ceiling — panels
+    animate independently so a rigid merge can't take it (instancing with per-instance
+    fade channels is the only remaining lever); the never-added stub sprites cost a few
+    KB of memory by design (zero draws); real fps still needs the live GPU (software GL
+    renders ~7-12fps headless). (shots in .shots/final_s01…final_s10)
 | scene | beat (tl) | verdict |
 |---|---|---|
 | 01 HOOK | 8 | pass — cube ramp + blooming studs, grade subtle |

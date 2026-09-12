@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import FaceIdFlow from "./FaceIdFlow";
-import PayFlow from "./PayFlow";
 
 type StateKey =
   | "idle"
@@ -419,7 +418,7 @@ export default function Guardian() {
   const [charKey, setCharKey] = useState<CharKey>("tvrobot");
   const [stateKey, setStateKey] = useState<StateKey>("idle");
   const [auto, setAuto] = useState(false);
-  const [overlay, setOverlay] = useState<"faceid" | "pay" | null>(null);
+  const [overlay, setOverlay] = useState<"faceid" | null>(null);
   const [dialOpen, setDialOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -606,25 +605,6 @@ export default function Guardian() {
                     <span>Biometric unlock</span>
                   </div>
                 </button>
-                <button
-                  className="tile"
-                  onClick={() => {
-                    setSheetOpen(false);
-                    setOverlay("pay");
-                  }}
-                >
-                  <span className="tile-icon" aria-hidden>
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="8.5" />
-                      <path d="M12 8v8" />
-                      <path d="M14.5 9.8c-.5-.8-1.4-1.3-2.5-1.3-1.4 0-2.5.8-2.5 1.9 0 2.6 5 1.2 5 3.7 0 1.1-1.1 1.9-2.5 1.9-1.1 0-2-.5-2.5-1.3" />
-                    </svg>
-                  </span>
-                  <div>
-                    <b>Send payment</b>
-                    <span>Guarded transfer</span>
-                  </div>
-                </button>
               </div>
             </div>
 
@@ -643,7 +623,6 @@ export default function Guardian() {
         />
       )}
       {overlay === "faceid" && <FaceIdFlow onClose={() => setOverlay(null)} />}
-      {overlay === "pay" && <PayFlow onClose={() => setOverlay(null)} />}
     </main>
   );
 }

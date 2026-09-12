@@ -14,7 +14,7 @@ import { useGuardianVoice, type VoiceState } from "./lib/useGuardianVoice";
 import { useLedgerPolicy, type PolicyParams, type Transport } from "./lib/useLedgerPolicy";
 import { faceIdGate } from "./lib/faceId";
 import { FLEX_OWNER } from "./lib/deployments";
-import { loadMandate, saveMandate, clearMandate, type StoredMandate } from "./lib/mandate";
+import { loadMandate, saveMandate, clearMandate, importMandateFromURL, type StoredMandate } from "./lib/mandate";
 
 type PanelId = "balances" | "positions" | "investments" | "mandates" | "activity" | "markets";
 type ActionState = "investing" | "protecting" | null;
@@ -331,6 +331,7 @@ export default function GuardianShell() {
   // On mount, restore the Flex-signed mandate from this device (localStorage). If present + unexpired
   // the app is armed with no daemon; surface it into gstate so the mandate panels render.
   useEffect(() => {
+    importMandateFromURL(); // "link this device": a ?m=… link (from desktop) arms this phone
     const m = loadMandate();
     if (m) {
       mandateRef.current = m;

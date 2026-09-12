@@ -8,9 +8,44 @@
   addresses/tx hashes) are byte-identical. Display font is now the Helvetica
   Bold system stack (100% offline, no webfont); JetBrains Mono stays for true
   data — addresses, tx hashes, tickers, benchmark figures.
+  R24: hero detail + merge pass. The vault, cage, voxel cast, scoped key,
+  market tokens/columns and both harbor gates gain real machining (seams,
+  bolts, grilles, reeded edges, mooring cleats) while every STATIC voxel
+  group bakes into merged vertex-colored meshes (the voxel batcher): the
+  heavy scenes draw ~2x FEWER calls than R23 with more detail on screen.
+  R25: connective tissue. Story-tied secondary detail between hero and
+  backdrop — the HOOK's calm breath motes, the voice orb's intake spiral,
+  the scope's sample-stream off the read market, the mandate's ticked
+  survey ring, yield motes off the invested market (re-park on ROTATE),
+  the robbery's red exfil intent-line (killed by the REVERT), and three
+  sequenced approach lights on the CCTP arc. All glow-sprite/line language,
+  +1..8 draws per scene, nothing added to scene 2 (the call ceiling).
+  R26: lighting/material/color cohesion. The film rim light now carries each
+  scene's semantic tint (cyan=safe · blue=AI/flow · red=danger; neutral steel
+  for the split harbor), the bloom knee is hue-fair (red/blue glows bloom as
+  richly as safe-cyan; whites a hair tighter — anti-haze), the safe's own key
+  light runs whisper-warm against the cool rim (warm = structure, the home),
+  and the robbery scene's off-palette OUTSIDE cross joins the danger red.
+  Zero new draws, zero new lights — uniform/color work only.
+  R27: the R21/R22 LIVE DEMO video scene is REMOVED (the real capture gets
+  stitched in externally during the edit) — the deck is back to 11 scenes,
+  renumbered; the DOM <video>, the R22 render gate and the ?capture scrub
+  path are all gone. Every R23-R26 environment/hero/connective/lighting
+  improvement on the surviving scenes is untouched.
+  R28: SMOOTHNESS pass (120fps target). Every decorative per-asset glow
+  QUAD is removed — the vault/cage/key/emblem/tower/harbor/cast/spark/
+  impact halos and the big mist/haze/core atmosphere sprites (additive
+  overdraw was the deck's fillrate ceiling). The "lit" read now rides the
+  existing emissive materials plus small additive lamp meshes; functional
+  glow PARTICLES (comet heads, motes, embers, beacons — they ARE content)
+  stay. The bloom blur chain drops 1/4 → 1/8 res and composites at .3
+  (was .5). The cliff rail merges to one draw; hot loops allocate nothing
+  (curve.getPoint/getTangent into scratch vectors). Content, timing,
+  beats, camera and story untouched.
   One persistent cool-graded Three.js world, 11 cinematic scenes.
   → / Space / PageDown : next   ← / PageUp : prev   1–9 / 0 : jump   - : close
   N : presenter notes   T : rehearsal timer   R : reset timer   F : fullscreen
+  P : perf HUD (live fps · frame ms · draw calls — dev tool, off by default)
   URL #N deep-links a scene; ?t=SEC fast-forwards its local clock (shot.sh uses both).
   Fully offline — three.js, fonts and art live in ./assets/.
 
@@ -23,10 +58,10 @@
   lights and glows.
   Heroes (R9): a procedural VOXEL CAST — no video. GUARDIAN (TV-head robot host:
   glowing eyes, smile, heart emblem), the AGENT (thin, single scanning visor-eye)
-  and the INTRUDER (dark hooded thief, scene 7), all built in-world from one
+  and the INTRUDER (dark hooded thief, scene 9), all built in-world from one
   outlined-voxel-box primitive (obox — the talos rig) with a per-frame act API.
   Plus a procedural wireframe ORB (technical beats) and the real Ledger Flex GLB
-  in scene 5 (desaturated, screen-emissive, camera-locked; embedded base64 in
+  in scene 6 (desaturated, screen-emissive, camera-locked; embedded base64 in
   assets/ledger.glb.js + assets/GLTFLoader.js so file:// works).
   All reveals are driven from the rAF loop, not CSS animations, so headless
   capture under virtual time is deterministic.
@@ -322,6 +357,16 @@
   #timer.over b{color:#fff;text-decoration:underline;text-underline-offset:3px}
   #timer span{color:var(--dim);font-size:10px;letter-spacing:.08em}
 
+  /* R23 — dev perf HUD: live FPS / frame-time / draw calls. OFF by default,
+     P toggles it; independent of ?chrome=0 (it is a verify tool, not deck
+     chrome); never runs under ?capture. Monospace, one quiet corner chip. */
+  #perf{position:fixed;right:44px;bottom:52px;z-index:9;display:none;
+    font-family:'JBMono',monospace;font-weight:400;font-size:11px;
+    letter-spacing:.08em;color:#cfcfcf;background:rgba(0,0,0,.72);
+    border:1px solid rgba(255,255,255,.22);padding:6px 11px;
+    pointer-events:none;font-variant-numeric:tabular-nums;white-space:pre}
+  #perf b{color:#35e0ff;font-weight:400}
+
   /* notes panel */
   #notes{position:fixed;top:0;right:0;bottom:0;width:min(430px,38vw);z-index:8;
     background:rgba(0,0,0,.96);border-left:1px solid rgba(255,255,255,.28);
@@ -353,10 +398,11 @@
   <div id="content"></div>
   <div id="prog"></div>
   <div id="timer"><b id="tm-el">0:00</b> <span id="tm-bud"></span></div>
-  <div id="hint"><b>&#8594;</b> advance &nbsp;&middot;&nbsp; <b>1&ndash;0</b> jump &nbsp;&middot;&nbsp; <b>-</b> close &nbsp;&middot;&nbsp; <b>N</b> notes &nbsp;&middot;&nbsp; <b>T</b> timer</div>
+  <div id="hint"><b>&#8594;</b> advance &nbsp;&middot;&nbsp; <b>1&ndash;0</b> jump &nbsp;&middot;&nbsp; <b>-</b> close &nbsp;&middot;&nbsp; <b>N</b> notes &nbsp;&middot;&nbsp; <b>T</b> timer &nbsp;&middot;&nbsp; <b>P</b> fps</div>
 </div>
+<div id="perf"></div>
 <div id="notes"><div class="nh" id="n-sec"></div><div class="nb" id="n-body"></div>
-  <div class="nk">KEYS — <b>&#8594;/space</b> next &middot; <b>&#8592;</b> back &middot; <b>1&ndash;0</b> jump (0 = proof) &middot; <b>-</b> close &middot; <b>T</b> timer &middot; <b>R</b> reset timer &middot; <b>F</b> fullscreen<br/>
+  <div class="nk">KEYS — <b>&#8594;/space</b> next &middot; <b>&#8592;</b> back &middot; <b>1&ndash;0</b> jump (0 = proof) &middot; <b>-</b> close &middot; <b>T</b> timer &middot; <b>R</b> reset timer &middot; <b>F</b> fullscreen &middot; <b>P</b> perf HUD (fps &middot; ms &middot; draw calls)<br/>
   URL hash <b>#1&hellip;#11</b> deep-links a scene; <b>?t=SEC</b> fast-forwards its clock (shot.sh uses both).<br/>
   <b>?auto=1</b> self-plays the deck on the note timings, resting on 11 (~3:54); <b>?chrome=0</b> hides the controls hint &mdash; together they are record mode.<br/>
   <b>?capture=1&amp;fps=30</b> external-clock stepping for headless mp4 export &mdash; render.sh drives it (live playback untouched).</div></div>
@@ -414,6 +460,14 @@ const filL=new THREE.DirectionalLight(0xffffff,.28);filL.position.set(-5,-4,7);s
 /* R14 — index 3 is the VOICE scene (thin air: the ghost wall must read,
    then the orb holds a clean black stage) */
 const FOGD=[.011,.024,.016,.014,.016,.011,.011,.011,.018,.011,.011];
+/* R26 — per-scene RIM TINT: the R1c rim light now carries each scene's
+   semantic hue (cyan=safe · blue=AI/flow · red=danger · the base blue-steel
+   for the split harbor), so every lit hero wears a quiet edge in its room's
+   meaning and separates from the R23 shells. One uniform lerp per frame
+   (same smoothing as the fog) — zero draws, zero new lights; ?cast QA keeps
+   the neutral steel rim (frame() returns early). */
+const RIMTINT=[0x9fd8e6,0x9caeff,0xe0a396,0x9caeff,0x9fd8e6,0x9fd8e6,
+  0x9caeff,0xe0a396,0xaac3ff,0x9fd8e6,0x9fd8e6].map(h=>new THREE.Color(h));
 
 /* ── R5 — the film grade: one restrained bloom + a gentle S-curve, identical
    for every scene, so the ten cuts read as one piece of footage. The world
@@ -421,8 +475,10 @@ const FOGD=[.011,.024,.016,.014,.016,.011,.011,.011,.018,.011,.011];
    and composited back with a soft contrast curve (R12: the old luma collapse
    is REMOVED — color survives, so hot accents bloom in their own hue).
    Values are deliberately shy —
-   the deck's own additive sprites still do the loud glowing; this pass only
-   breathes a halo around anything already hot. WebGL2 only; the direct
+   R28: with the per-asset glow quads gone the bloom has far less to do, so
+   the blur chain runs at 1/8 res (was 1/4 — 4× fewer blurred pixels) and
+   composites at .3 (was .5): a whisper halo on the remaining emissive
+   reads, not a haze pass. WebGL2 only; the direct
    render remains as the untouched fallback. */
 const POST=(()=>{if(!renderer.capabilities.isWebGL2)return null;
   const VS="varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,1.,1.);}";
@@ -432,13 +488,19 @@ const POST=(()=>{if(!renderer.capabilities.isWebGL2)return null;
      end. Half-float buffers keep the deck's long dark gradients band-free. */
   const HF=THREE.HalfFloatType;
   const rtScene=new THREE.WebGLRenderTarget(sz.x,sz.y,{samples:2,type:HF});
-  const rtA=new THREE.WebGLRenderTarget(sz.x>>2,sz.y>>2,{type:HF,depthBuffer:false}),
-        rtB=new THREE.WebGLRenderTarget(sz.x>>2,sz.y>>2,{type:HF,depthBuffer:false});
+  const rtA=new THREE.WebGLRenderTarget(sz.x>>3,sz.y>>3,{type:HF,depthBuffer:false}),
+        rtB=new THREE.WebGLRenderTarget(sz.x>>3,sz.y>>3,{type:HF,depthBuffer:false});
   const cam2=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
   const thresh=new THREE.ShaderMaterial({uniforms:{tex:{value:null}},vertexShader:VS,
     fragmentShader:"uniform sampler2D tex;varying vec2 vUv;void main(){"+
       "vec3 c=texture2D(tex,vUv).rgb;float l=dot(c,vec3(.2126,.7152,.0722));"+
-      "gl_FragColor=vec4(c*smoothstep(.20,.80,l),1.);}"});  /* linear-domain knee */
+      /* R26 — hue-fair knee: pure luma let cyan bloom ~10× richer than the
+         same-energy red/blue (luma weights .07/.21 vs .72), so danger-red
+         and money-blue always read flatter than safe-cyan. 35% max-channel
+         evens the response across the palette; the knee rises .20→.22 so
+         neutral whites come out a hair TIGHTER, not hazier. */
+      "l=mix(l,max(c.r,max(c.g,c.b)),.35);"+
+      "gl_FragColor=vec4(c*smoothstep(.22,.82,l),1.);}"});  /* linear-domain knee */
   const blur=new THREE.ShaderMaterial({uniforms:{tex:{value:null},dir:{value:new THREE.Vector2()}},
     vertexShader:VS,fragmentShader:"uniform sampler2D tex;uniform vec2 dir;varying vec2 vUv;"+
       "void main(){float w[5];w[0]=.227;w[1]=.194;w[2]=.121;w[3]=.054;w[4]=.016;"+
@@ -448,7 +510,7 @@ const POST=(()=>{if(!renderer.capabilities.isWebGL2)return null;
       "gl_FragColor=vec4(a,1.);}"});
   const comp=new THREE.ShaderMaterial({uniforms:{base:{value:null},glow:{value:null}},
     vertexShader:VS,fragmentShader:"uniform sampler2D base,glow;varying vec2 vUv;"+
-      "void main(){vec3 c=texture2D(base,vUv).rgb+texture2D(glow,vUv).rgb*.5;"+
+      "void main(){vec3 c=texture2D(base,vUv).rgb+texture2D(glow,vUv).rgb*.3;"+
       /* the exact sRGB encode three would have done at the canvas */
       "c=clamp(c,0.,1.);"+
       "c=mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));"+
@@ -460,7 +522,7 @@ const POST=(()=>{if(!renderer.capabilities.isWebGL2)return null;
   quad.frustumCulled=false;
   const qs=new THREE.Scene();qs.add(quad);
   addEventListener("resize",()=>{const s=renderer.getDrawingBufferSize(new THREE.Vector2());
-    rtScene.setSize(s.x,s.y);rtA.setSize(s.x>>2,s.y>>2);rtB.setSize(s.x>>2,s.y>>2)});
+    rtScene.setSize(s.x,s.y);rtA.setSize(s.x>>3,s.y>>3);rtB.setSize(s.x>>3,s.y>>3)});
   return{render(){
     renderer.setRenderTarget(rtScene);renderer.render(scene,camera);
     quad.material=thresh;thresh.uniforms.tex.value=rtScene.texture;
@@ -510,6 +572,74 @@ function dustGrid(g,{ext=42,step=2.4,y=0,op=.3,seed=3}={}){
     transparent:true,opacity:op,depthWrite:false}));
   g.add(m);return m}
 
+/* ── R23 — per-scene ENVIRONMENT: depth instead of flat black ──────────────
+   Two shared, GPU-trivial layers behind every 3D scene:
+   · SHELL — one open BackSide cylinder (r85, ONE shared geometry) wearing a
+     baked vertical gradient in the scene's semantic tint — a faint horizon
+     glow band dying to the deck black above and below — so each set reads
+     as a room/void with air, never a poster. Painted in display values and
+     tagged SRGBColorSpace (hardware-decoded to linear; the POST comp's
+     manual sRGB encode returns them exactly — and the 8-bit sRGB steps stay
+     perceptually even in the darks, no banding). fog:false: the shell IS
+     the world beyond the fog. Looks are cached — scenes sharing a tint
+     share one texture + material.
+   · STARS — a few hundred soft additive points (the shared GLOW map) on a
+     far ring behind all action. Static by design: parallax comes free from
+     the camera moves, so the field costs ZERO per-frame updates.
+   Only the active set is visible (frame() gates the rest), so the whole
+   system adds exactly TWO draw calls to any frame. */
+const ENVGEO=new THREE.CylinderGeometry(85,85,170,48,1,true);
+const ENVMATS={};
+const ENVLOOKS={
+  /* tint · peak alpha over the deck black · band centre (canvas v, 0=top) ·
+     spread. void = s3: the glow lives DOWN in the pit, not at eye level */
+  cyan:{tint:0x35e0ff,peak:.10,by:.58,sp:.30},
+  blue:{tint:0x4c6fff,peak:.12,by:.57,sp:.32},
+  red:{tint:0xff4d4d,peak:.085,by:.60,sp:.30},
+  void:{tint:0xff4d4d,peak:.105,by:.80,sp:.34}};
+function envMat(look){
+  if(ENVMATS[look])return ENVMATS[look];
+  const W=look==="harbor"?512:16,H=256;
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;
+  const x=cv.getContext("2d");
+  x.fillStyle="#07090c";x.fillRect(0,0,W,H);
+  const band=(tint,peak,by,sp)=>{const r=tint>>16&255,gc=tint>>8&255,b=tint&255;
+    const c=a=>`rgba(${r},${gc},${b},${Math.max(0,a).toFixed(3)})`;
+    const gr=x.createLinearGradient(0,0,0,H);
+    gr.addColorStop(Math.max(0,by-sp),c(0));gr.addColorStop(by,c(peak));
+    gr.addColorStop(Math.min(1,by+sp*.45),c(peak*.4));
+    gr.addColorStop(Math.min(1,by+sp*.85),c(0));
+    x.fillStyle=gr;x.fillRect(0,0,W,H)};
+  if(look==="harbor"){
+    /* scene 10 is a SPLIT room: a red storm-glow behind the Base shore
+       (world −x → u .75) and a cyan haven-glow behind Arc (+x → u .25),
+       over a whisper of neutral horizon. Wrap seam (u 0/1) stays black. */
+    band(0x9fb4c4,.05,.58,.30);
+    const blob=(u,tint,peak,rad)=>{const r=tint>>16&255,gc=tint>>8&255,b=tint&255;
+      const gr=x.createRadialGradient(u*W,.60*H,0,u*W,.60*H,rad*W);
+      gr.addColorStop(0,`rgba(${r},${gc},${b},${peak})`);
+      gr.addColorStop(1,`rgba(${r},${gc},${b},0)`);
+      x.fillStyle=gr;x.fillRect(0,0,W,H)};
+    blob(.75,0xff4d4d,.11,.20);blob(.25,0x35e0ff,.10,.17)}
+  else{const L=ENVLOOKS[look];band(L.tint,L.peak,L.by,L.sp)}
+  const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
+  return ENVMATS[look]=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,
+    fog:false,depthWrite:false})}
+function makeEnv(g,{look="cyan",stars=360,starCol=0x9fd4e2,starOp=.38,seed=101,
+  rMin=34,rMax=76,yMin=-4,yMax=44,size=.55}={}){
+  const shell=new THREE.Mesh(ENVGEO,envMat(look));
+  shell.position.y=15;shell.renderOrder=-20;shell.frustumCulled=false;g.add(shell);
+  if(stars){const R=rng(seed),pos=[];
+    for(let i=0;i<stars;i++){const a=R()*6.283,r=rMin+R()*(rMax-rMin);
+      pos.push(Math.cos(a)*r,yMin+R()*(yMax-yMin),Math.sin(a)*r)}
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+    const p=new THREE.Points(geo,new THREE.PointsMaterial({color:starCol,size,
+      map:GLOW,transparent:true,opacity:starOp,depthWrite:false,fog:false,
+      blending:THREE.AdditiveBlending}));
+    p.renderOrder=-19;g.add(p)}
+  return shell}
+
 /* ── R11 — the vault is a proper voxel SAFE ────────────────────────────────
    The generic cube is gone. Built in the cast's own language (obox — toon
    voxel + BackSide ink shell): a banded monolith on a plinth, a thick ROUND
@@ -520,29 +650,49 @@ function dustGrid(g,{ext=42,step=2.4,y=0,op=.3,seed=3}={}){
    unchanged (grp/outer/inner/core/body/update) so the cage, comet flows,
    REVERT flare and every camera still line up. The body no longer spins full
    circle — a slow pendulum keeps the DOOR to the room (the R6 Flex rule).
-   update(t,k,seam): seam ∈ [0,1] flares the door-gap glow on danger beats. */
+   update(t,k,seam): seam ∈ [0,1] flares the door-gap glow on danger beats.
+   R24 — the safe gains machining (plinth feet, crown ribs, door-plate seams,
+   a side intake grille, the keypad's conduit run, a boss bolt ring, back
+   braces) and the whole static shell BAKES through the voxel batcher into
+   one merged toon mesh + merged ink shells: more detail, ~1/3 the calls. */
 function makeVault(g,{x=0,y=1.8,z=0,s=2.2,op=.85}={}){
   const grp=new THREE.Group();grp.position.set(x,y,z);g.add(grp);
-  const mats=[];                       /* toon fills + base shade, for k-dims */
+  const mats=[];                       /* merged fill mats, for k-dims */
   const reg=m=>{mats.push({m,c:m.color.clone()});return m};
-  const vx=(w,h,d,c,px,py,pz,rz=0,olT=s*.014)=>{     /* obox, dim-tracked */
-    const f=obox(grp,w,h,d,c,px,py,pz,rz,true,OUTLINE,olT);reg(f.material);return f};
-  const cylZ=(r,h,c,px,py,pz,segs=28,ink=s*.008)=>{  /* round voxel, axis +z */
-    const cg=new THREE.Group();cg.position.set(px,py,pz);grp.add(cg);
-    const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,segs),reg(vmat(c)));
-    m.rotation.x=Math.PI/2;cg.add(m);
-    if(ink){const o=new THREE.Mesh(new THREE.CylinderGeometry(r+ink,r+ink,h+ink,segs),
-      new THREE.MeshBasicMaterial({color:OUTLINE,side:THREE.BackSide}));
-      o.rotation.x=Math.PI/2;cg.add(o)}
-    return cg};
+  /* R24 — vx/cylZ feed the batcher; everything static lands as ONE toon
+     mesh + ink shells at the flush below the keypad. Only the wheel, dial,
+     seam, lamp and the glows stay live meshes. */
+  const B=voxBatch();
+  const vx=(w,h,d,c,px,py,pz,rz=0,olT=s*.014)=>B.box(w,h,d,c,px,py,pz,rz,true,OUTLINE,olT);
+  const vq=(w,h,d,c,px,py,pz,rz=0)=>B.box(w,h,d,c,px,py,pz,rz,false);
+  const cylZ=(r,h,c,px,py,pz,segs=28,ink=s*.008)=>B.cyl(r,h,c,px,py,pz,"z",segs,ink);
   /* body — banded monolith, plinth + crown; front toward +z */
-  const body=vx(s*.94,s*.78,s*.80,0x6d6d6d,0,0,0);
+  vx(s*.94,s*.78,s*.80,0x6d6d6d,0,0,0);
   vx(s*1.02,s*.10,s*.88,0x3a3a3a,0,-.465*s,0);       /* plinth */
   vx(s*.99,s*.085,s*.85,0x8d8d8d,0,.447*s,0);        /* crown cap */
   vx(s*.96,s*.045,s*.82,0x303030,0,.295*s,0);        /* wrap grooves */
   vx(s*.96,s*.045,s*.82,0x303030,0,-.295*s,0);
   vx(s*.60,s*.55,s*.03,0x575757,0,.01*s,-.415*s);    /* back service panel */
   vx(s*.80,s*.64,s*.05,0x7e7e7e,0,.01*s,.415*s);     /* front door plate */
+  /* R24 — machining, all merged (draw-call-free detail): plinth corner
+     feet, crown ribs, recessed door-plate seams, a side intake grille, the
+     keypad's conduit run + clamps, crossed back braces, a boss bolt ring */
+  for(const[fx,fz]of[[-1,-1],[1,-1],[-1,1],[1,1]])
+    vq(s*.15,s*.05,s*.15,0x2c2c2c,fx*.42*s,-.535*s,fz*.36*s);
+  for(const rz2 of[-.24,0,.24])
+    vq(s*.88,s*.022,s*.06,0x707070,0,.496*s,rz2*s);
+  vq(s*.70,s*.018,s*.012,0x303030,0,.315*s,.4425*s);
+  vq(s*.70,s*.018,s*.012,0x303030,0,-.29*s,.4425*s);
+  vq(s*.02,s*.30,s*.36,0x565656,-.478*s,.05*s,0);
+  for(const gy2 of[-.04,.01,.06,.11])
+    vq(s*.012,s*.032,s*.30,0x1c1c1c,-.492*s,gy2*s,0);
+  vq(s*.022,s*.40,s*.014,0x2e2e2e,-.335*s,-.02*s,.444*s);
+  vq(s*.055,s*.03,s*.024,0x8a8a8a,-.335*s,.09*s,.447*s);
+  vq(s*.055,s*.03,s*.024,0x8a8a8a,-.335*s,-.13*s,.447*s);
+  vq(s*.55,s*.03,s*.02,0x4a4a4a,0,.01*s,-.437*s,.6);
+  vq(s*.55,s*.03,s*.02,0x4a4a4a,0,.01*s,-.437*s,-.6);
+  for(let bi=0;bi<4;bi++){const ba=(45+bi*90)*Math.PI/180;
+    cylZ(s*.016,s*.02,0xdadada,Math.cos(ba)*s*.21,.02*s+Math.sin(ba)*s*.21,.573*s,8,s*.005)}
   /* the door — thick round slab, proud of the plate */
   cylZ(s*.295,s*.10,0xa2a2a2,0,.02*s,.485*s,36,s*.012);
   cylZ(s*.255,s*.035,0x8a8a8a,0,.02*s,.552*s,36);    /* door boss step */
@@ -552,23 +702,22 @@ function makeVault(g,{x=0,y=1.8,z=0,s=2.2,op=.85}={}){
     blending:THREE.AdditiveBlending,depthWrite:false});
   const seamR=new THREE.Mesh(new THREE.TorusGeometry(s*.318,s*.012,8,64),seamM);
   seamR.position.set(0,.02*s,.446*s);grp.add(seamR);
-  const seamGlow=glowSprite(CYAN,s*1.15,.05);
-  seamGlow.position.set(0,.02*s,.47*s);grp.add(seamGlow);
+  /* R28 — the seam's halo quad is gone: the additive torus IS the seam glow */
   /* rivets around the door ring (right arc left open for the hinges) */
   for(const a of[70,110,150,190,230,270])
     cylZ(s*.024,s*.028,0xcbcbcb,Math.cos(a*Math.PI/180)*s*.362,
       .02*s+Math.sin(a*Math.PI/180)*s*.362,.448*s,10,s*.006);
-  /* spoke handle wheel + combination dial hub */
+  /* spoke handle wheel + combination dial hub — its own merged batch (it
+     turns as a unit): rim + three spokes land as 2 draws instead of 8 */
   const wheel=new THREE.Group();wheel.position.set(0,.02*s,.578*s);grp.add(wheel);
-  {const rimM=reg(vmat(0xd6d6d6));
-   const rim=new THREE.Mesh(new THREE.TorusGeometry(s*.165,s*.021,10,48),rimM);
-   const rimO=new THREE.Mesh(new THREE.TorusGeometry(s*.165,s*.030,10,48),
-     new THREE.MeshBasicMaterial({color:OUTLINE,side:THREE.BackSide}));
-   wheel.add(rim,rimO);
+  {const WB=voxBatch();
+   WB.geo(new THREE.TorusGeometry(s*.165,s*.021,10,48),0xd6d6d6);
+   WB.inkGeo(new THREE.TorusGeometry(s*.165,s*.030,10,48));
    for(const a of[90,210,330]){const rad=a*Math.PI/180;
-     reg(obox(wheel,s*.034,s*.150,s*.034,0xc9c9c9,
+     WB.box(s*.034,s*.150,s*.034,0xc9c9c9,
        Math.cos(rad)*s*.0925,Math.sin(rad)*s*.0925,0,
-       rad+Math.PI/2,true,OUTLINE,s*.012).material)}}
+       rad+Math.PI/2,true,OUTLINE,s*.012)}
+   reg(WB.flush(wheel).material)}
   cylZ(s*.088,s*.055,0xe6e6e6,0,.02*s,.585*s,24);    /* hub */
   /* dial face — ticked ring drawn once, idles under update */
   const dialB=board(128,128,c=>{c.save();c.translate(64,64);
@@ -592,6 +741,8 @@ function makeVault(g,{x=0,y=1.8,z=0,s=2.2,op=.85}={}){
     cylZ(s*.028,s*.024,0xbdbdbd,bx*s,by*s,.446*s,10,s*.006);
   /* keypad chip — button grid + breathing status lamp */
   vx(s*.135,s*.10,s*.028,0x2c2c2c,-.335*s,.245*s,.442*s);
+  /* R24 — the bake: the whole static shell lands here as one toon mesh */
+  const body=B.flush(grp);reg(body.material);
   const padB=board(64,48,c=>{c.fillStyle="rgba(255,255,255,.8)";
     for(let r=0;r<3;r++)for(let q=0;q<3;q++){
       c.globalAlpha=.35+.5*((r*3+q)%3===0?1:.4);
@@ -602,30 +753,33 @@ function makeVault(g,{x=0,y=1.8,z=0,s=2.2,op=.85}={}){
   const lampM=new THREE.MeshBasicMaterial({color:CYAN,transparent:true,opacity:.6});
   const lamp=new THREE.Mesh(new THREE.BoxGeometry(s*.026,s*.02,s*.012),lampM);
   lamp.position.set(-.335*s,.302*s,.458*s);grp.add(lamp);
-  const lampGlow=glowSprite(CYAN,s*.22,.25);
-  lampGlow.position.copy(lamp.position);grp.add(lampGlow);
-  /* a close point light gives the faces a gradient; toon steps quantize it */
-  const pl=new THREE.PointLight(0xffffff,s*2.4,s*6,2);pl.position.set(s*.95,s*1.45,s*.95);
+  /* R28 — lamp halo quad removed; the breathing lamp chip carries the blink */
+  /* a close point light gives the faces a gradient; toon steps quantize it.
+     R26 — it runs whisper-WARM against the deck's cool rim (warm/neutral =
+     structure; the safe is the home the money returns to): same direction
+     as the global key, so the temperature split reads as grading, not a
+     second light source. */
+  const pl=new THREE.PointLight(0xffeedd,s*2.4,s*6,2);pl.position.set(s*.95,s*1.45,s*.95);
   grp.add(pl);
   /* the kept through-line language: white frame, faint gimbal, corner studs,
      behind-silhouette halo — the deck's "guarded object" signature */
   const outer=lineBox(s,s,s,WHITE,op*.5);
   const gim=lineBox(s*1.26,s*1.26,s*1.26,GRAY,op*.2);
-  /* R12 — the behind-halo runs cyan: the guarded object's safe aura */
+  /* R28 — the s*2.7 behind-halo quad (the deck's biggest single overdraw
+     source, one per vault) is NOT drawn any more; `halo` stays as an API
+     stub (returned as .core — scene 2 still scales it, harmlessly) */
   const halo=glowSprite(CYAN,s*2.7,.28);halo.renderOrder=-1;
-  const studs=new THREE.Group();
-  const studGeo=new THREE.SphereGeometry(s*.034,8,6);
   const studM=new THREE.MeshBasicMaterial({color:WHITE,transparent:true,opacity:.9});
-  for(const sx of[-1,1])for(const sy of[-1,1])for(const sz of[-1,1]){
-    const st=new THREE.Mesh(studGeo,studM);
-    st.position.set(sx,sy,sz).multiplyScalar(s*.5);studs.add(st)}
-  grp.add(outer,gim,halo,studs);
+  const studP=[];                      /* R24 — 8 corner studs, ONE mesh */
+  for(const sx of[-1,1])for(const sy of[-1,1])for(const sz of[-1,1])
+    studP.push({g:bakeGeo(new THREE.SphereGeometry(s*.034,8,6),sx*s*.5,sy*s*.5,sz*s*.5)});
+  const studs=new THREE.Mesh(mergeParts(studP,false),studM);
+  grp.add(outer,gim,studs);
   return{grp,outer,inner:gim,core:halo,body,
     update(t,k=1,seam=0,danger=0){
       /* pendulum — the door faces the room at every beat, never turns away */
       grp.rotation.y=.21*Math.sin(t*.16)+.09*Math.sin(t*.061+2.1);
       gim.rotation.y=-t*.3;gim.rotation.x=t*.17;
-      halo.material.opacity=(.22+.09*Math.sin(t*1.4))*k;
       outer.material.opacity=op*.5*k;gim.material.opacity=op*.2*k;
       const dim=Math.max(.45,k);
       for(const q of mats)q.m.color.copy(q.c).multiplyScalar(dim);
@@ -633,11 +787,8 @@ function makeVault(g,{x=0,y=1.8,z=0,s=2.2,op=.85}={}){
       wheel.rotation.z=.5*Math.sin(t*.21+.7);
       dial.rotation.z=1.3*Math.sin(t*.34)+.5*Math.sin(t*.9+1.3);
       seamM.color.copy(C_CYAN).lerp(C_RED,clamp01(danger));   /* mandate=cyan · danger=red */
-      seamGlow.material.color.copy(seamM.color);
       seamM.opacity=(.10+.05*Math.sin(t*1.3))*k+.8*seam;
-      seamGlow.material.opacity=.05*k+.5*seam;
       lampM.opacity=(.3+.6*Math.pow(Math.max(0,Math.sin(t*2.2+1)),10))*k;
-      lampGlow.material.opacity=lampM.opacity*.45;
       studM.opacity=.9*Math.min(1,k*1.2)}}}
 
 function makeCage(g,{x=0,y=1.8,z=0,r=3.1}={}){
@@ -646,8 +797,22 @@ function makeCage(g,{x=0,y=1.8,z=0,r=3.1}={}){
   const wire=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(r,1)),
     new THREE.LineBasicMaterial({color:0xcdeef8,transparent:true,opacity:0}));
   const halo=glowSprite(CYAN,r*3.1,0);
-  grp.add(wire,halo);
-  return{grp,wire,halo}}
+  /* R24 — the boundary's engineering depth, PROMOTED from scene 9's one-off
+     so every cage can wear it: an inner counter-rotating shell, a whisper
+     additive facet skin, vertex studs. Hidden by default (visible=false —
+     costs nothing); each scene switches on and drives what it needs. */
+  const inner=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(r*.865,1)),
+    new THREE.LineBasicMaterial({color:GRAY,transparent:true,opacity:0}));
+  const facet=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),
+    new THREE.MeshBasicMaterial({color:WHITE,transparent:true,opacity:0,
+      blending:THREE.AdditiveBlending,depthWrite:false}));
+  const studs=new THREE.Points(new THREE.IcosahedronGeometry(r,1),
+    new THREE.PointsMaterial({color:WHITE,size:.07,transparent:true,opacity:0,depthWrite:false}));
+  inner.visible=facet.visible=studs.visible=false;
+  /* R28 — the r*3.1 boundary halo quad is never drawn (fillrate); the wire,
+     inner shell, facet skin and studs carry the boundary. API stub kept. */
+  grp.add(wire,inner,facet,studs);
+  return{grp,wire,halo,inner,facet,studs}}
 
 /* canvas boards — labels drawn once, redrawn when fonts land */
 const fontRedraws=[];
@@ -977,12 +1142,32 @@ function makeMotes(g,n,scale=.42,seed=11){
        additive blowout wherever the cluster happens to sit on the curve */
     arr.push({s,off:(i+R())/n,j1:R()*6.283,j2:R()*6.283})}
   return arr}
+const _smP=new THREE.Vector3();       /* R28 — no per-mote Vector3 allocs */
 function streamMotes(motes,curve,u,t,opK,jit=.14){
-  for(const m of motes){const uu=(u+m.off)%1;const p=curve.getPoint(uu);
+  for(const m of motes){const uu=(u+m.off)%1;const p=curve.getPoint(uu,_smP);
     m.s.position.set(p.x+Math.sin(t*2.1+m.j1)*jit,p.y+Math.sin(t*1.7+m.j2)*jit,
       p.z+Math.cos(t*1.9+m.j1)*jit);
     const o=Math.sin(uu*Math.PI)*opK;m.s.material.opacity=o;m.s.visible=o>.02}}
 function hideMotes(motes){for(const m of motes){m.s.visible=false;m.s.material.opacity=0}}
+
+/* ── R25 — RISERS: a slow column of glow motes (the calm breath over the
+   guarded safe, yield ticking off an invested market). Build-time scatter;
+   runtime is a pure function of t — capture-deterministic. update(t,k[,cx,
+   cz]): k gates the whole column (invisible sprites draw nothing), cx/cz
+   re-parks it live (scene 8 moves it market→market on the ROTATE beat). */
+function makeRisers(g,{n=6,col=CYAN,x=0,z=0,sx=1.8,sz=1.3,y0=.35,y1=4.4,
+  size=.34,op=.11,speed=.16,seed=141}={}){
+  const R=rng(seed),arr=[];
+  for(let i=0;i<n;i++){const s=glowSprite(col,size+R()*.24,0);s.visible=false;g.add(s);
+    arr.push({s,dx:(R()-.5)*2*sx,dz:(R()-.5)*2*sz,ph:R(),sp:speed*(.7+R()*.6),
+      wb:R()*6.283})}
+  return{update(t,k,cx=x,cz=z){
+    for(const m of arr){const u=(t*m.sp+m.ph)%1;
+      const o=op*Math.sin(u*Math.PI)*k;
+      m.s.visible=o>.012;
+      if(m.s.visible){m.s.position.set(cx+m.dx+.22*Math.sin(t*.5+m.wb),
+        y0+(y1-y0)*u,cz+m.dz+.18*Math.cos(t*.45+m.wb));
+        m.s.material.opacity=o}}}}}
 
 /* ── R3 — comet flows ──────────────────────────────────────────────────────
    A fund particle with real depth: a hot glow head, an additive streak
@@ -1026,7 +1211,8 @@ function cometAt(c,X,px,py,pz,dirV,L,o){
   c.wake.scale.set(L*1.8,w*2.7,1);c.wake.material.opacity=.2*o;c.wake.visible=true}
 function streamComets(comets,curve,u,t,opK,X,{jit=.1,trail=1.1}={}){
   for(const c of comets){const uu=(u+c.off)%1;
-    _cP.copy(curve.getPoint(uu));_cT.copy(curve.getTangent(uu));
+    /* R28 — getPoint/getTangent into the scratch vectors (no allocs) */
+    curve.getPoint(uu,_cP);curve.getTangent(uu,_cT);
     const o=Math.sin(uu*Math.PI)*opK*c.sh;
     cometAt(c,X,
       _cP.x+Math.sin(t*2.1+c.j1)*jit,
@@ -1049,7 +1235,12 @@ function makeOrb(g,{x=0,y=2.6,z=0,r=1.1,amp=.1,speed=1}={}){
     {color:WHITE,wireframe:true,transparent:true,opacity:.3}));
   const pts=new THREE.Points(geo,new THREE.PointsMaterial(
     {color:WHITE,size:.03,transparent:true,opacity:.6,depthWrite:false}));
-  const core=glowSprite(WHITE,r*3.4,.45);
+  /* R28 — the r*3.4 core glow quad becomes a SMALL additive core sphere:
+     same hot-heart read at a fraction of the fillrate (child index 2 kept —
+     the voice scene tints children[2]) */
+  const core=new THREE.Mesh(new THREE.SphereGeometry(r*.3,12,8),
+    new THREE.MeshBasicMaterial({color:WHITE,transparent:true,opacity:.45,
+      blending:THREE.AdditiveBlending,depthWrite:false}));
   grp.add(mesh,pts,core);
   const st={amp,speed,op:1};
   return{grp,st,update(t){
@@ -1103,6 +1294,67 @@ function ocyl(p,r,h,c,x,y,z,ax="y",segs=16,ink=.016){
     new THREE.MeshBasicMaterial({color:OUTLINE,side:THREE.BackSide}));
     o.rotation.copy(m.rotation);o.position.copy(m.position);p.add(o)}
   return m}
+/* ── R24 — the VOXEL BATCHER ───────────────────────────────────────────────
+   The cast + safe were hundreds of tiny meshes (every obox = a toon fill +
+   a BackSide ink shell = 2 draw calls; a lone guardian ≈ 140 calls). All
+   STATIC detail inside one rigid group now bakes into ONE vertex-colored
+   toon mesh plus ONE merged ink shell per outline color — identical pixels
+   (same geometry, same toon ramp; vertex colors ride the exact sRGB→linear
+   path material colors do), a fraction of the draw calls, and the headroom
+   that pays for R24's added machining. Only what ANIMATES (eyes, lamps,
+   pips, accents, wheels, dials) stays a live mesh. Ink materials are never
+   mutated → one shared material per outline color, deck-wide. Each merged
+   fill keeps its OWN toon material so per-character dims (the scene-6
+   traverse) hit each mesh exactly once, like the old per-box materials. */
+const INKMATS={};
+const inkMat=c=>INKMATS[c]||(INKMATS[c]=new THREE.MeshBasicMaterial({color:c,side:THREE.BackSide}));
+const _bkM=new THREE.Matrix4(),_bkE=new THREE.Euler(),_bkQ=new THREE.Quaternion(),
+      _bkS=new THREE.Vector3(1,1,1),_bkP=new THREE.Vector3();
+function bakeGeo(geo,x=0,y=0,z=0,rx=0,ry=0,rz=0){
+  if(rx||ry||rz){_bkE.set(rx,ry,rz);_bkQ.setFromEuler(_bkE)}else _bkQ.identity();
+  _bkP.set(x,y,z);_bkM.compose(_bkP,_bkQ,_bkS);
+  geo.applyMatrix4(_bkM);return geo}
+function mergeParts(parts,vcol){
+  let vt=0,it=0;
+  for(const p of parts){vt+=p.g.attributes.position.count;it+=p.g.index.count}
+  const pos=new Float32Array(vt*3),nor=new Float32Array(vt*3),
+    col=vcol?new Float32Array(vt*3):null,
+    idx=vt>65535?new Uint32Array(it):new Uint16Array(it);
+  const C=new THREE.Color();let vo=0,io=0;
+  for(const p of parts){const gg=p.g,n=gg.attributes.position.count;
+    pos.set(gg.attributes.position.array,vo*3);
+    nor.set(gg.attributes.normal.array,vo*3);
+    if(col){C.set(p.c==null?0xffffff:p.c);
+      for(let i=0;i<n;i++){const k=(vo+i)*3;col[k]=C.r;col[k+1]=C.g;col[k+2]=C.b}}
+    const ia=gg.index.array;
+    for(let i=0;i<ia.length;i++)idx[io+i]=ia[i]+vo;
+    vo+=n;io+=ia.length;gg.dispose()}
+  const out=new THREE.BufferGeometry();
+  out.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  out.setAttribute("normal",new THREE.BufferAttribute(nor,3));
+  if(col)out.setAttribute("color",new THREE.BufferAttribute(col,3));
+  out.setIndex(new THREE.BufferAttribute(idx,1));
+  return out}
+function voxBatch(){
+  const fills=[],inks={};
+  const ink=(c,g)=>{(inks[c]||(inks[c]=[])).push({g})};
+  return{
+    box(w,h,d,c,x,y,z,rz=0,ol=true,olC=OUTLINE,olT=.03){
+      fills.push({g:bakeGeo(new THREE.BoxGeometry(w,h,d),x,y,z,0,0,rz),c});
+      if(ol)ink(olC,bakeGeo(new THREE.BoxGeometry(w+olT,h+olT,d+olT),x,y,z,0,0,rz))},
+    cyl(r,h,c,x,y,z,ax="y",segs=16,inkT=.016,olC=OUTLINE){
+      const rx=ax==="z"?Math.PI/2:0,rz=ax==="x"?Math.PI/2:0;
+      fills.push({g:bakeGeo(new THREE.CylinderGeometry(r,r,h,segs),x,y,z,rx,0,rz),c});
+      if(inkT)ink(olC,bakeGeo(new THREE.CylinderGeometry(r+inkT,r+inkT,h+inkT,segs),x,y,z,rx,0,rz))},
+    geo(gg,c,x=0,y=0,z=0,rx=0,ry=0,rz=0){fills.push({g:bakeGeo(gg,x,y,z,rx,ry,rz),c})},
+    inkGeo(gg,olC=OUTLINE,x=0,y=0,z=0,rx=0,ry=0,rz=0){ink(olC,bakeGeo(gg,x,y,z,rx,ry,rz))},
+    flush(parent){
+      let fill=null;
+      if(fills.length){fill=new THREE.Mesh(mergeParts(fills,true),
+        new THREE.MeshToonMaterial({color:0xffffff,gradientMap:tgm,vertexColors:true}));
+        parent.add(fill)}
+      for(const c in inks)parent.add(new THREE.Mesh(mergeParts(inks[c],false),inkMat(+c)));
+      return fill}}}
 let CHRN=0;
 class Chr{
   constructor(parent,kind,scale=1.15,opts={}){
@@ -1130,33 +1382,46 @@ class Chr{
      joint axles, layered pauldrons/boots, panel seams + greebles, and a
      proper TV — bezel plate, corner screws, speaker grille, side knobs,
      vented ear panels, coiled antenna. Anchors (arm/head/leg groups) and the
-     whole act API are byte-compatible with R9. */
+     whole act API are byte-compatible with R9.
+     R24 — same body, new plumbing: each rigid group's static voxels bake
+     through the batcher into one toon mesh + one ink shell (~140 draws →
+     ~27), plus a little extra machining — axle caps, plate screws, pauldron
+     rivets, panel bolts, a chin seam — that the merge makes free. */
   _guardian(){
     const g=this.g,BODY=0xdedede,LIGHT=0xf1f1f1,PANEL=0xcfcfcf,MID=0x9d9d9d,
       MID2=0x8a8a8a,DRK=0x565656,JNT=0x474747,INK2=0x1c1c1c;
     [-0.17,0.17].forEach(x=>{const lg=new THREE.Group();lg.position.set(x,.32,0);
-      ocyl(lg,.065,.16,JNT,0,-.015,0,"x",12,.012);        /* hip axle */
-      obox(lg,.17,.15,.21,MID,0,-.09,0,0,true,OUTLINE,.02);
-      obox(lg,.19,.05,.23,0x2e2e2e,0,-.175,0,0,false);    /* knee band */
-      obox(lg,.15,.11,.19,MID,0,-.245,0,0,true,OUTLINE,.02);
-      obox(lg,.10,.08,.015,PANEL,0,-.24,.10,0,false);     /* shin plate */
-      obox(lg,.20,.09,.26,DRK,0,-.275,.02,0,true,OUTLINE,.02);
-      obox(lg,.16,.055,.08,MID2,0,-.288,.17,0,false);     /* toe cap */
-      obox(lg,.17,.05,.05,MID2,0,-.292,-.115,0,false);    /* heel */
+      const B=voxBatch();
+      B.cyl(.065,.16,JNT,0,-.015,0,"x",12,.012);          /* hip axle */
+      B.cyl(.031,.02,MID2,-.089,-.015,0,"x",10,0);        /* R24 — axle caps */
+      B.cyl(.031,.02,MID2,.089,-.015,0,"x",10,0);
+      B.box(.17,.15,.21,MID,0,-.09,0,0,true,OUTLINE,.02);
+      B.box(.19,.05,.23,0x2e2e2e,0,-.175,0,0,false);      /* knee band */
+      B.box(.15,.11,.19,MID,0,-.245,0,0,true,OUTLINE,.02);
+      B.box(.10,.08,.015,PANEL,0,-.24,.10,0,false);       /* shin plate */
+      B.box(.02,.02,.012,MID2,-.032,-.264,.106,0,false);  /* R24 — plate screws */
+      B.box(.02,.02,.012,MID2,.032,-.264,.106,0,false);
+      B.box(.20,.09,.26,DRK,0,-.275,.02,0,true,OUTLINE,.02);
+      B.box(.16,.055,.08,MID2,0,-.288,.17,0,false);       /* toe cap */
+      B.box(.17,.05,.05,MID2,0,-.292,-.115,0,false);      /* heel */
+      B.flush(lg);
       g.add(lg);this.legs.push(lg)});
     const to=this.torso=new THREE.Group();g.add(to);
-    obox(to,.62,.13,.42,MID,0,.40,0);              /* base band */
-    obox(to,.30,.095,.02,MID2,0,.40,.218,0,false); /* pelvis plate */
-    obox(to,.74,.022,.50,0x2f2f2f,0,.462,0,0,false); /* waist seam ring */
-    obox(to,.72,.44,.48,BODY,0,.67,0);             /* core */
-    obox(to,.05,.32,.38,PANEL,-.375,.66,0,0,true,OUTLINE,.016); /* side plates */
-    obox(to,.05,.32,.38,PANEL,.375,.66,0,0,true,OUTLINE,.016);
-    obox(to,.76,.11,.50,LIGHT,0,.94,0);            /* chest cap */
-    ocyl(to,.155,.045,MID2,0,1.0,0,"y",18,.01);    /* collar ring */
+    const TB=voxBatch();
+    TB.box(.62,.13,.42,MID,0,.40,0);              /* base band */
+    TB.box(.30,.095,.02,MID2,0,.40,.218,0,false); /* pelvis plate */
+    TB.box(.74,.022,.50,0x2f2f2f,0,.462,0,0,false); /* waist seam ring */
+    TB.box(.72,.44,.48,BODY,0,.67,0);             /* core */
+    TB.box(.05,.32,.38,PANEL,-.375,.66,0,0,true,OUTLINE,.016); /* side plates */
+    TB.box(.05,.32,.38,PANEL,.375,.66,0,0,true,OUTLINE,.016);
+    for(const sx of[-.404,.404])for(const sy of[.77,.55])
+      TB.box(.014,.026,.026,MID2,sx,sy,.13,0,false);      /* R24 — plate bolts */
+    TB.box(.76,.11,.50,LIGHT,0,.94,0);            /* chest cap */
+    TB.cyl(.155,.045,MID2,0,1.0,0,"y",18,.01);    /* collar ring */
     /* the heart emblem in a proper housing — bezel + dark inset + the cyan
        heart (R12: the guardian's safe signal) */
-    obox(to,.26,.26,.035,LIGHT,0,.70,.245,0,true,OUTLINE,.016);
-    obox(to,.205,.205,.02,0x141414,0,.70,.258,0,false);
+    TB.box(.26,.26,.035,LIGHT,0,.70,.245,0,true,OUTLINE,.016);
+    TB.box(.205,.205,.02,0x141414,0,.70,.258,0,false);
     const hb=board(96,96,c=>{c.fillStyle="#35e0ff";
       c.beginPath();c.moveTo(48,82);c.bezierCurveTo(16,56,10,32,24,21);
       c.bezierCurveTo(36,12,46,20,48,30);c.bezierCurveTo(50,20,60,12,72,21);
@@ -1164,171 +1429,212 @@ class Chr{
     const heart=new THREE.Mesh(new THREE.PlaneGeometry(.16,.16),
       new THREE.MeshBasicMaterial({map:hb.tex,transparent:true,opacity:.92}));
     heart.position.set(0,.70,.272);to.add(heart);
+    /* R28 — heart halo quad not drawn (stub kept: update still writes it) */
     this.heartGlow=glowSprite(CYAN,.34,.18);
-    this.heartGlow.position.set(0,.70,.30);to.add(this.heartGlow);
+    this.heartGlow.position.set(0,.70,.30);
     /* chest hatch (bolted service door) + vent slats + status pips */
-    obox(to,.30,.13,.02,PANEL,0,.50,.246,0,false);
-    obox(to,.09,.018,.014,DRK,0,.468,.258,0,false);       /* latch */
+    TB.box(.30,.13,.02,PANEL,0,.50,.246,0,false);
+    TB.box(.09,.018,.014,DRK,0,.468,.258,0,false);        /* latch */
     for(const[bx,by]of[[-.125,.545],[.125,.545],[-.125,.462],[.125,.462]])
-      obox(to,.02,.02,.012,MID2,bx,by,.258,0,false);      /* hatch bolts */
+      TB.box(.02,.02,.012,MID2,bx,by,.258,0,false);       /* hatch bolts */
     for(const vy of[.505,.535,.565])
-      obox(to,.12,.016,.012,INK2,-.235,vy,.246,0,false);  /* vent slats */
+      TB.box(.12,.016,.012,INK2,-.235,vy,.246,0,false);   /* vent slats */
     this.pips=[.0,.045,.09].map(dy=>{
       const p=new THREE.Mesh(new THREE.BoxGeometry(.026,.026,.014),
         new THREE.MeshBasicMaterial({color:CYAN,transparent:true,opacity:.5}));
       p.position.set(.255,.505+dy,.248);to.add(p);return p});
-    obox(to,.54,.34,.07,MID,0,.66,-.27,0,true,OUTLINE,.02); /* back pack */
+    TB.box(.54,.34,.07,MID,0,.66,-.27,0,true,OUTLINE,.02); /* back pack */
     for(const vy of[.60,.66,.72])
-      obox(to,.34,.02,.014,INK2,0,vy,-.312,0,false);      /* back vents */
+      TB.box(.34,.02,.014,INK2,0,vy,-.312,0,false);       /* back vents */
+    for(const[bx,by]of[[-.23,.79],[.23,.79],[-.23,.53],[.23,.53]])
+      TB.box(.02,.02,.012,DRK,bx,by,-.308,0,false);       /* R24 — pack bolts */
+    TB.flush(to);
     /* arms — shoulder axle + layered pauldron, elbow drum, paneled forearm,
        wrist ring, mitt + thumb. Anchors unchanged (±.45,.88). */
     const mkArm=s=>{const a=new THREE.Group();a.position.set(s*.45,.88,0);
-      ocyl(a,.07,.09,JNT,s*.01,0,0,"x",12,.012);          /* shoulder axle */
-      obox(a,.20,.11,.24,LIGHT,0,.035,0,0,true,OUTLINE,.02);  /* pauldron */
-      obox(a,.22,.045,.26,MID2,0,.10,0,0,false);          /* pauldron rim */
-      obox(a,.14,.19,.17,MID,0,-.115,0,0,true,OUTLINE,.02);
-      ocyl(a,.075,.16,JNT,0,-.235,0,"x",12,.012);         /* elbow drum */
-      obox(a,.13,.12,.16,MID,0,-.325,0,0,true,OUTLINE,.02);
-      obox(a,.015,.10,.10,PANEL,s*.072,-.325,0,0,false);  /* forearm panel */
-      obox(a,.145,.028,.175,0x2e2e2e,0,-.395,0,0,false);  /* wrist ring */
-      obox(a,.16,.10,.18,DRK,0,-.45,0,0,true,OUTLINE,.02);
-      obox(a,.05,.08,.06,DRK,-s*.095,-.44,.05,0,true,OUTLINE,.014); /* thumb */
+      const AB=voxBatch();
+      AB.cyl(.07,.09,JNT,s*.01,0,0,"x",12,.012);          /* shoulder axle */
+      AB.box(.20,.11,.24,LIGHT,0,.035,0,0,true,OUTLINE,.02);  /* pauldron */
+      AB.box(.22,.045,.26,MID2,0,.10,0,0,false);          /* pauldron rim */
+      AB.box(.02,.02,.02,DRK,-.07,.128,.07,0,false);      /* R24 — rim rivets */
+      AB.box(.02,.02,.02,DRK,.07,.128,-.07,0,false);
+      AB.box(.14,.19,.17,MID,0,-.115,0,0,true,OUTLINE,.02);
+      AB.cyl(.075,.16,JNT,0,-.235,0,"x",12,.012);         /* elbow drum */
+      AB.box(.13,.12,.16,MID,0,-.325,0,0,true,OUTLINE,.02);
+      AB.box(.015,.10,.10,PANEL,s*.072,-.325,0,0,false);  /* forearm panel */
+      AB.box(.145,.028,.175,0x2e2e2e,0,-.395,0,0,false);  /* wrist ring */
+      AB.box(.16,.10,.18,DRK,0,-.45,0,0,true,OUTLINE,.02);
+      AB.box(.05,.08,.06,DRK,-s*.095,-.44,.05,0,true,OUTLINE,.014); /* thumb */
+      AB.flush(a);
       to.add(a);return a};
     this.armL=mkArm(-1);this.armR=mkArm(1);
     /* the TV head — shell, vented ears, bezel plate + corner screws, screen,
        speaker grille + twin knobs + power LED, top vent, coiled antenna */
     const hd=this.head=new THREE.Group();hd.position.set(0,1.04,0);to.add(hd);
-    ocyl(hd,.105,.075,JNT,0,-.035,0,"y",16,.014);         /* neck joint */
-    obox(hd,.88,.60,.52,LIGHT,0,.30,0);
-    obox(hd,.05,.36,.42,MID,-.465,.30,0,0,true,OUTLINE,.02);   /* ear panels */
-    obox(hd,.05,.36,.42,MID,.465,.30,0,0,true,OUTLINE,.02);
+    const HB=voxBatch();
+    HB.cyl(.105,.075,JNT,0,-.035,0,"y",16,.014);          /* neck joint */
+    HB.box(.88,.60,.52,LIGHT,0,.30,0);
+    HB.box(.05,.36,.42,MID,-.465,.30,0,0,true,OUTLINE,.02);    /* ear panels */
+    HB.box(.05,.36,.42,MID,.465,.30,0,0,true,OUTLINE,.02);
     for(const vz of[-.10,0,.10]){                          /* ear vent slats */
-      obox(hd,.012,.28,.05,INK2,-.492,.30,vz,0,false);
-      obox(hd,.012,.28,.05,INK2,.492,.30,vz,0,false)}
-    obox(hd,.70,.50,.04,BODY,-.05,.30,.25,0,true,OUTLINE,.02); /* bezel plate */
+      HB.box(.012,.28,.05,INK2,-.492,.30,vz,0,false);
+      HB.box(.012,.28,.05,INK2,.492,.30,vz,0,false)}
+    HB.box(.70,.50,.04,BODY,-.05,.30,.25,0,true,OUTLINE,.02); /* bezel plate */
     for(const[sx,sy]of[[-.37,.52],[.27,.52],[-.37,.08],[.27,.08]])
-      ocyl(hd,.016,.015,MID2,sx,sy,.272,"z",8,0);          /* corner screws */
-    obox(hd,.60,.42,.03,0x0f0f0f,-.05,.30,.262,0,false);   /* the screen */
+      HB.cyl(.016,.015,MID2,sx,sy,.272,"z",8,0);           /* corner screws */
+    HB.box(.60,.42,.03,0x0f0f0f,-.05,.30,.262,0,false);    /* the screen */
+    HB.box(.56,.014,.012,MID2,-.05,.028,.262,0,false);     /* R24 — chin seam */
     this.eyeG=new THREE.Group();this.eyeG.position.set(-.05,.36,.285);hd.add(this.eyeG);
     [-0.14,0.14].forEach(ex=>{
       const e=new THREE.Mesh(new THREE.BoxGeometry(.10,.13,.02),
         new THREE.MeshBasicMaterial({color:CYAN}));
-      e.position.set(ex,0,0);this.eyeG.add(e);
-      const eg=glowSprite(CYAN,.22,.3);eg.position.set(ex,0,.02);this.eyeG.add(eg)});
+      e.position.set(ex,0,0);this.eyeG.add(e)});   /* R28 — eye halos gone */
     const sb=board(128,72,c=>{c.strokeStyle="#fff";c.lineWidth=10;c.lineCap="round";
       c.beginPath();c.arc(64,6,40,Math.PI*.22,Math.PI*.78);c.stroke()});
     const smile=new THREE.Mesh(new THREE.PlaneGeometry(.24,.135),
       new THREE.MeshBasicMaterial({map:sb.tex,transparent:true,opacity:.95}));
     smile.position.set(-.05,.155,.285);hd.add(smile);
     for(const gy of[.44,.405,.37,.335])
-      obox(hd,.095,.014,.012,INK2,.37,gy,.262,0,false);    /* speaker grille */
+      HB.box(.095,.014,.012,INK2,.37,gy,.262,0,false);     /* speaker grille */
     for(const ky of[.25,.165]){                            /* twin knobs */
-      ocyl(hd,.034,.026,MID2,.37,ky,.264,"z",10,.008);
-      obox(hd,.013,.024,.012,0xf4f4f4,.37,ky+.008,.279,0,false)}
+      HB.cyl(.034,.026,MID2,.37,ky,.264,"z",10,.008);
+      HB.box(.013,.024,.012,0xf4f4f4,.37,ky+.008,.279,0,false)}
     const led=new THREE.Mesh(new THREE.BoxGeometry(.024,.024,.012),
       new THREE.MeshBasicMaterial({color:CYAN,transparent:true,opacity:.85}));
     led.position.set(.37,.095,.264);hd.add(led);
-    obox(hd,.46,.04,.30,BODY,-.06,.622,-.04,0,true,OUTLINE,.016); /* top ridge */
+    HB.box(.46,.04,.30,BODY,-.06,.622,-.04,0,true,OUTLINE,.016); /* top ridge */
     for(const vz of[-.12,-.04,.04])
-      obox(hd,.34,.016,.05,INK2,-.06,.645,vz,0,false);     /* top vents */
-    obox(hd,.72,.46,.03,BODY,0,.30,-.262,0,false);         /* back panel */
+      HB.box(.34,.016,.05,INK2,-.06,.645,vz,0,false);      /* top vents */
+    HB.box(.72,.46,.03,BODY,0,.30,-.262,0,false);          /* back panel */
     for(const vy of[.40,.34,.28])
-      obox(hd,.30,.02,.012,INK2,-.12,vy,-.283,0,false);    /* back vents */
-    ocyl(hd,.05,.028,MID2,.24,.615,0,"y",12,.008);         /* antenna collar */
+      HB.box(.30,.02,.012,INK2,-.12,vy,-.283,0,false);     /* back vents */
+    for(const[bx,by]of[[-.32,.50],[.32,.50],[-.32,.10],[.32,.10]])
+      HB.box(.02,.02,.012,MID2,bx,by,-.281,0,false);       /* R24 — panel bolts */
+    HB.cyl(.05,.028,MID2,.24,.615,0,"y",12,.008);          /* antenna collar */
+    HB.flush(hd);
     /* R17 — the antenna rides a GROUP pivoted at the collar: it sways in an
        idle breeze and whips slightly behind quick head/body turns (inertia).
        Same parts, repositioned relative to the pivot. */
     const ant=this.antG=new THREE.Group();ant.position.set(.24,.63,0);hd.add(ant);
-    obox(ant,.035,.15,.035,DRK,0,.065,0,0,false);          /* mast */
-    obox(ant,.075,.018,.075,MID2,0,.09,0,0,false);         /* coil washers */
-    obox(ant,.075,.018,.075,MID2,0,.125,0,0,false);
+    const NB=voxBatch();
+    NB.box(.035,.15,.035,DRK,0,.065,0,0,false);            /* mast */
+    NB.box(.075,.018,.075,MID2,0,.09,0,0,false);           /* coil washers */
+    NB.box(.075,.018,.075,MID2,0,.125,0,0,false);
+    NB.flush(ant);
     this.tip=new THREE.Mesh(new THREE.BoxGeometry(.09,.09,.09),
       new THREE.MeshBasicMaterial({color:CYAN,transparent:true,opacity:.9}));
     this.tip.position.set(0,.16,0);ant.add(this.tip);
+    /* R28 — antenna-tip halo quad not drawn (stub kept for update writes) */
     this.tipGlow=glowSprite(CYAN,.4,.4);
-    this.tipGlow.position.copy(this.tip.position);ant.add(this.tipGlow)}
+    this.tipGlow.position.copy(this.tip.position)}
   /* R15 — the AI rebuilt sleek-but-intricate: segmented wrap visor with side
      glass + bezel lines, ear sensor pods, spine ridge nubs, sternum plate
      over a breathing blue core, waist ring, jointed limbs with shin/forearm
-     plating. Anchors and the act API unchanged. */
+     plating. Anchors and the act API unchanged.
+     R24 — batched (rigid groups merge to one toon + ink mesh each) and
+     machined: thigh pistons, waist notches, sternum screws, yoke bolts,
+     ear-pod rim lips, chin notches, calf vents. */
   _agent(){
     const g=this.g,BODY=0x8f8f8f,LITE=0xb4b4b4,PLATE=0xa8a8a8,MID=0x676767,
       DRK=0x3f3f3f,JNT=0x333333,INK2=0x1f1f1f,VIS=0x0d0d0d;
     [-0.12,0.12].forEach(x=>{const lg=new THREE.Group();lg.position.set(x,.36,0);
-      ocyl(lg,.05,.10,JNT,0,-.005,0,"x",10,.01);          /* hip axle */
-      obox(lg,.11,.15,.14,MID,0,-.085,0,0,true,OUTLINE,.018);
-      ocyl(lg,.052,.095,JNT,0,-.18,0,"x",10,.01);         /* knee drum */
-      obox(lg,.09,.12,.12,MID,0,-.265,0,0,true,OUTLINE,.018);
-      obox(lg,.065,.11,.014,PLATE,0,-.26,.068,0,false);   /* shin guard */
-      obox(lg,.07,.03,.08,JNT,0,-.325,0,0,false);         /* ankle */
-      obox(lg,.13,.055,.19,DRK,0,-.335,.02,0,true,OUTLINE,.016);
-      obox(lg,.10,.035,.05,MID,0,-.345,.13,0,false);      /* toe */
+      const B=voxBatch();
+      B.cyl(.05,.10,JNT,0,-.005,0,"x",10,.01);            /* hip axle */
+      B.box(.11,.15,.14,MID,0,-.085,0,0,true,OUTLINE,.018);
+      B.cyl(.012,.08,PLATE,0,-.132,.072,"y",8,0);         /* R24 — thigh piston */
+      B.cyl(.052,.095,JNT,0,-.18,0,"x",10,.01);           /* knee drum */
+      B.box(.09,.12,.12,MID,0,-.265,0,0,true,OUTLINE,.018);
+      B.box(.065,.11,.014,PLATE,0,-.26,.068,0,false);     /* shin guard */
+      B.box(.05,.012,.01,INK2,0,-.25,-.063,0,false);      /* R24 — calf vents */
+      B.box(.05,.012,.01,INK2,0,-.275,-.063,0,false);
+      B.box(.07,.03,.08,JNT,0,-.325,0,0,false);           /* ankle */
+      B.box(.13,.055,.19,DRK,0,-.335,.02,0,true,OUTLINE,.016);
+      B.box(.10,.035,.05,MID,0,-.345,.13,0,false);        /* toe */
+      B.flush(lg);
       g.add(lg);this.legs.push(lg)});
     const to=this.torso=new THREE.Group();g.add(to);
-    obox(to,.40,.14,.28,MID,0,.42,0);
-    obox(to,.18,.10,.016,DRK,0,.42,.148,0,false);         /* pelvis plate */
-    ocyl(to,.175,.05,INK2,0,.50,0,"y",16,.012);           /* waist ring */
-    obox(to,.46,.44,.32,BODY,0,.70,0);
-    obox(to,.30,.24,.03,PLATE,0,.77,.165,0,true,OUTLINE,.014); /* sternum */
+    const TB=voxBatch();
+    TB.box(.40,.14,.28,MID,0,.42,0);
+    TB.box(.18,.10,.016,DRK,0,.42,.148,0,false);          /* pelvis plate */
+    TB.cyl(.175,.05,INK2,0,.50,0,"y",16,.012);            /* waist ring */
+    for(const[nx,nz]of[[-.128,-.128],[.128,-.128],[-.128,.128],[.128,.128]])
+      TB.box(.03,.026,.03,LITE,nx,.50,nz,0,false);        /* R24 — ring notches */
+    TB.box(.46,.44,.32,BODY,0,.70,0);
+    TB.box(.30,.24,.03,PLATE,0,.77,.165,0,true,OUTLINE,.014); /* sternum */
+    TB.box(.014,.014,.014,DRK,-.125,.87,.183,0,false);    /* R24 — plate screws */
+    TB.box(.014,.014,.014,DRK,.125,.87,.183,0,false);
+    TB.box(.34,.014,.01,0x262626,0,.60,.163,0,false);     /* chest seam */
+    TB.box(.012,.28,.01,0x262626,-.185,.71,.163,0,false); /* panel seams */
+    TB.box(.012,.28,.01,0x262626,.185,.71,.163,0,false);
+    TB.box(.035,.22,.16,INK2,-.243,.70,0,0,false);        /* side intakes */
+    TB.box(.035,.22,.16,INK2,.243,.70,0,0,false);
+    TB.box(.30,.28,.02,0x7a7a7a,0,.72,-.172,0,false);     /* back panel */
+    for(let i=0;i<4;i++)                                  /* spine ridge */
+      TB.box(.05,.055,.045,DRK,0,.885-.09*i,-.175,0,false);
+    TB.box(.50,.09,.34,LITE,0,.95,0);                     /* collar */
+    TB.cyl(.085,.06,JNT,0,1.0,0,"y",14,.012);             /* neck joint */
+    TB.box(.07,.09,.15,DRK,-.245,.90,0,0,false);          /* shoulder yokes */
+    TB.box(.07,.09,.15,DRK,.245,.90,0,0,false);
+    TB.box(.016,.02,.02,PLATE,-.245,.90,.082,0,false);    /* R24 — yoke bolts */
+    TB.box(.016,.02,.02,PLATE,.245,.90,.082,0,false);
+    TB.flush(to);
     this.coreLite=new THREE.Mesh(new THREE.BoxGeometry(.05,.05,.016),
       new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.75}));
     this.coreLite.position.set(0,.77,.185);to.add(this.coreLite);
-    const clg=glowSprite(EBLUE,.15,.2);clg.position.set(0,.77,.20);to.add(clg);
-    obox(to,.34,.014,.01,0x262626,0,.60,.163,0,false);    /* chest seam */
-    obox(to,.012,.28,.01,0x262626,-.185,.71,.163,0,false);/* panel seams */
-    obox(to,.012,.28,.01,0x262626,.185,.71,.163,0,false);
-    obox(to,.035,.22,.16,INK2,-.243,.70,0,0,false);       /* side intakes */
-    obox(to,.035,.22,.16,INK2,.243,.70,0,0,false);
-    obox(to,.30,.28,.02,0x7a7a7a,0,.72,-.172,0,false);    /* back panel */
-    for(let i=0;i<4;i++)                                  /* spine ridge */
-      obox(to,.05,.055,.045,DRK,0,.885-.09*i,-.175,0,false);
-    obox(to,.50,.09,.34,LITE,0,.95,0);                    /* collar */
-    ocyl(to,.085,.06,JNT,0,1.0,0,"y",14,.012);            /* neck joint */
-    obox(to,.07,.09,.15,DRK,-.245,.90,0,0,false);         /* shoulder yokes */
-    obox(to,.07,.09,.15,DRK,.245,.90,0,0,false);
+    /* R28 — core halo quad gone; the breathing chip carries the read */
     /* arms — axle + cap plate, elbow drum, paneled forearm, wrist, hand */
     const mkArm=s=>{const a=new THREE.Group();a.position.set(s*.30,.90,0);
-      ocyl(a,.055,.085,JNT,s*.005,0,0,"x",10,.01);        /* shoulder axle */
-      obox(a,.13,.09,.15,PLATE,0,.025,0,0,true,OUTLINE,.016); /* cap plate */
-      obox(a,.10,.17,.12,MID,0,-.105,0,0,true,OUTLINE,.018);
-      ocyl(a,.048,.09,JNT,0,-.215,0,"x",10,.01);          /* elbow drum */
-      obox(a,.09,.13,.11,MID,0,-.315,0,0,true,OUTLINE,.018);
-      obox(a,.014,.11,.075,PLATE,s*.052,-.315,0,0,false); /* forearm panel */
-      obox(a,.10,.024,.12,INK2,0,-.385,0,0,false);        /* wrist ring */
-      obox(a,.11,.09,.13,DRK,0,-.44,0,0,true,OUTLINE,.016);
-      obox(a,.035,.065,.05,DRK,-s*.065,-.43,.04,0,true,OUTLINE,.012);
+      const AB=voxBatch();
+      AB.cyl(.055,.085,JNT,s*.005,0,0,"x",10,.01);        /* shoulder axle */
+      AB.box(.13,.09,.15,PLATE,0,.025,0,0,true,OUTLINE,.016); /* cap plate */
+      AB.box(.016,.016,.016,DRK,0,.075,.05,0,false);      /* R24 — cap bolt */
+      AB.box(.10,.17,.12,MID,0,-.105,0,0,true,OUTLINE,.018);
+      AB.cyl(.048,.09,JNT,0,-.215,0,"x",10,.01);          /* elbow drum */
+      AB.box(.09,.13,.11,MID,0,-.315,0,0,true,OUTLINE,.018);
+      AB.box(.014,.11,.075,PLATE,s*.052,-.315,0,0,false); /* forearm panel */
+      AB.box(.10,.024,.12,INK2,0,-.385,0,0,false);        /* wrist ring */
+      AB.box(.11,.09,.13,DRK,0,-.44,0,0,true,OUTLINE,.016);
+      AB.box(.035,.065,.05,DRK,-s*.065,-.43,.04,0,true,OUTLINE,.012);
+      AB.flush(a);
       to.add(a);return a};
     this.armL=mkArm(-1);this.armR=mkArm(1);
     const hd=this.head=new THREE.Group();hd.position.set(0,1.02,0);to.add(hd);
-    obox(hd,.46,.32,.38,BODY,0,.17,0);
-    obox(hd,.48,.05,.40,LITE,0,.335,0,0,true,OUTLINE,.016); /* crown cap */
-    obox(hd,.40,.045,.32,DRK,0,.012,0,0,false);           /* chin band */
-    obox(hd,.38,.15,.03,VIS,0,.19,.195,0,false);          /* the visor */
-    obox(hd,.03,.13,.13,VIS,-.235,.19,.095,0,false);      /* visor side wrap */
-    obox(hd,.03,.13,.13,VIS,.235,.19,.095,0,false);
-    obox(hd,.42,.022,.014,PLATE,0,.285,.198,0,false);     /* visor bezel */
-    obox(hd,.42,.022,.014,PLATE,0,.095,.198,0,false);
-    obox(hd,.03,.02,.014,JNT,-.10,.335,.204,0,false);     /* brow sensors */
-    obox(hd,.03,.02,.014,JNT,.10,.335,.204,0,false);
+    const HB=voxBatch();
+    HB.box(.46,.32,.38,BODY,0,.17,0);
+    HB.box(.48,.05,.40,LITE,0,.335,0,0,true,OUTLINE,.016); /* crown cap */
+    HB.box(.40,.045,.32,DRK,0,.012,0,0,false);            /* chin band */
+    HB.box(.03,.016,.014,INK2,-.09,.012,.162,0,false);    /* R24 — chin notches */
+    HB.box(.03,.016,.014,INK2,.09,.012,.162,0,false);
+    HB.box(.38,.15,.03,VIS,0,.19,.195,0,false);           /* the visor */
+    HB.box(.03,.13,.13,VIS,-.235,.19,.095,0,false);       /* visor side wrap */
+    HB.box(.03,.13,.13,VIS,.235,.19,.095,0,false);
+    HB.box(.42,.022,.014,PLATE,0,.285,.198,0,false);      /* visor bezel */
+    HB.box(.42,.022,.014,PLATE,0,.095,.198,0,false);
+    HB.box(.03,.02,.014,JNT,-.10,.335,.204,0,false);      /* brow sensors */
+    HB.box(.03,.02,.014,JNT,.10,.335,.204,0,false);
     const cam=new THREE.Mesh(new THREE.BoxGeometry(.022,.022,.014),
       new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.7}));
     cam.position.set(0,.335,.204);hd.add(cam);            /* forehead sensor */
-    ocyl(hd,.065,.05,JNT,-.25,.19,0,"x",12,.01);          /* ear pods */
-    ocyl(hd,.065,.05,JNT,.25,.19,0,"x",12,.01);
+    HB.cyl(.065,.05,JNT,-.25,.19,0,"x",12,.01);           /* ear pods */
+    HB.cyl(.065,.05,JNT,.25,.19,0,"x",12,.01);
+    HB.cyl(.07,.008,PLATE,-.277,.19,0,"x",12,0);          /* R24 — pod rim lips */
+    HB.cyl(.07,.008,PLATE,.277,.19,0,"x",12,0);
     for(const s of[-1,1]){const pp=new THREE.Mesh(new THREE.BoxGeometry(.016,.016,.016),
       new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.7}));
       pp.position.set(s*.284,.19,0);hd.add(pp)}           /* pod pips */
-    obox(hd,.03,.20,.22,MID,0,.42,-.07,0,true,OUTLINE,.016); /* dorsal fin */
+    HB.box(.03,.20,.22,MID,0,.42,-.07,0,true,OUTLINE,.016); /* dorsal fin */
     this.finLite=new THREE.Mesh(new THREE.BoxGeometry(.016,.16,.016),
       new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.45}));
     this.finLite.position.set(0,.43,-.186);hd.add(this.finLite);
-    obox(hd,.20,.016,.012,INK2,0,.24,-.196,0,false);      /* back vents */
-    obox(hd,.20,.016,.012,INK2,0,.20,-.196,0,false);
+    HB.box(.20,.016,.012,INK2,0,.24,-.196,0,false);       /* back vents */
+    HB.box(.20,.016,.012,INK2,0,.20,-.196,0,false);
+    HB.flush(hd);
     this.eye=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.02),
       new THREE.MeshBasicMaterial({color:0x6f8dff}));      /* R12 — AI blue */
     this.eye.position.set(0,.19,.215);hd.add(this.eye);
+    /* R28 — visor halo quad not drawn (stub kept: update + scene 6 write it) */
     this.eyeGlow=glowSprite(EBLUE,.26,.4);
-    this.eyeGlow.position.set(0,.19,.235);hd.add(this.eyeGlow)}
+    this.eyeGlow.position.set(0,.19,.235)}
   /* R16 — the thief rebuilt at the R15 craft level (~55 obox + 4 ocyl vs 14):
      layered torn skirt with a jagged hem ring, plated chest + belt over the
      cloth, spine spike row, layered pauldron plates under the kept shoulder
@@ -1347,65 +1653,82 @@ class Chr{
         {color:RED,transparent:true,opacity:op}));
       m.position.set(x,y,z);if(rz)m.rotation.z=rz;m.userData.op=op;
       p.add(m);this.accents.push(m);return m};
-    /* skirt — three stacked cloth bands + a ring of torn hem strips (no feet) */
-    obox(g,.68,.13,.54,CLK2,0,.065,0,0,true,EDGE,.03);
-    obox(g,.60,.17,.48,CLK,0,.21,.01,0,true,EDGE,.03);
-    obox(g,.54,.15,.44,CLK3,0,.335,.02,0,true,EDGE2,.024);
+    /* skirt — three stacked cloth bands + a ring of torn hem strips (no feet)
+       R24 — the thief batches like the rest of the cast (rigid groups merge
+       to one toon + ink mesh per outline shade) and gains quiet kit: belt
+       pouches, back cloak ribs, flap stitching. Threat language untouched. */
+    const GB=voxBatch();
+    GB.box(.68,.13,.54,CLK2,0,.065,0,0,true,EDGE,.03);
+    GB.box(.60,.17,.48,CLK,0,.21,.01,0,true,EDGE,.03);
+    GB.box(.54,.15,.44,CLK3,0,.335,.02,0,true,EDGE2,.024);
     {const hemR=rng(83);
      for(let i=0;i<9;i++){const a=i/9*Math.PI*2+.3;
-       obox(g,.08+hemR()*.05,.09+hemR()*.13,.045,i%2?CLK2:CLK,
+       GB.box(.08+hemR()*.05,.09+hemR()*.13,.045,i%2?CLK2:CLK,
          Math.sin(a)*.30,-.01-hemR()*.03,Math.cos(a)*.235,
          (hemR()-.5)*.5,true,EDGE2,.018)}}
+    GB.flush(g);
     const to=this.torso=new THREE.Group();to.position.set(0,.36,0);g.add(to);
     this.hunch=.38;
-    obox(to,.52,.42,.42,CLK,0,.21,.02,0,true,EDGE,.03);          /* core */
-    obox(to,.44,.19,.05,CLK3,0,.27,.245,0,true,EDGE2,.022);      /* chest plate */
-    obox(to,.19,.13,.05,CLK2,-.125,.115,.25,.14,true,EDGE2,.018);/* lower plates */
-    obox(to,.17,.12,.05,CLK2,.13,.105,.245,-.2,true,EDGE2,.018);
-    acc(to,.015,.15,.02,0,.115,.262,0,.4);                       /* red chest seam */
-    obox(to,.50,.06,.40,CLK2,0,.005,.02,0,true,EDGE2,.02);       /* belt band */
-    obox(to,.07,.05,.02,CLK3,-.06,.005,.235,0,false);            /* buckle chip */
-    obox(to,.56,.12,.44,CLK2,0,.44,0,0,true,EDGE,.03);           /* yoke */
-    obox(to,.46,.055,.38,CLK3,0,.505,0,0,true,EDGE2,.02);        /* collar guard */
+    const TB=voxBatch();
+    TB.box(.52,.42,.42,CLK,0,.21,.02,0,true,EDGE,.03);           /* core */
+    TB.box(.44,.19,.05,CLK3,0,.27,.245,0,true,EDGE2,.022);       /* chest plate */
+    TB.box(.19,.13,.05,CLK2,-.125,.115,.25,.14,true,EDGE2,.018); /* lower plates */
+    TB.box(.17,.12,.05,CLK2,.13,.105,.245,-.2,true,EDGE2,.018);
+    TB.box(.50,.06,.40,CLK2,0,.005,.02,0,true,EDGE2,.02);        /* belt band */
+    TB.box(.07,.05,.02,CLK3,-.06,.005,.235,0,false);             /* buckle chip */
+    TB.box(.09,.08,.05,CLK3,-.185,0,.21,.12,true,EDGE2,.016);    /* R24 — pouches */
+    TB.box(.08,.075,.05,CLK3,.185,0,.205,-.15,true,EDGE2,.016);
+    TB.box(.56,.12,.44,CLK2,0,.44,0,0,true,EDGE,.03);            /* yoke */
+    TB.box(.46,.055,.38,CLK3,0,.505,0,0,true,EDGE2,.02);         /* collar guard */
     /* shoulders — kept diamonds + secondary jags + angled pauldron plates */
-    obox(to,.15,.15,.15,CLK2,-.36,.48,0,.79,true,EDGE,.026);
-    obox(to,.15,.15,.15,CLK2,.36,.48,0,.79,true,EDGE,.026);
-    obox(to,.09,.09,.09,CLK3,-.44,.40,.02,.79,true,EDGE2,.02);
-    obox(to,.09,.09,.09,CLK3,.44,.40,.02,.79,true,EDGE2,.02);
-    obox(to,.11,.11,.11,CLK2,-.14,.52,-.16,.79,true,EDGE,.024);
-    obox(to,.11,.11,.11,CLK2,.14,.52,-.16,.79,true,EDGE,.024);
-    obox(to,.20,.05,.30,CLK3,-.30,.42,.01,.24,true,EDGE2,.02);   /* pauldron plates */
-    obox(to,.20,.05,.30,CLK3,.30,.42,.01,-.24,true,EDGE2,.02);
+    TB.box(.15,.15,.15,CLK2,-.36,.48,0,.79,true,EDGE,.026);
+    TB.box(.15,.15,.15,CLK2,.36,.48,0,.79,true,EDGE,.026);
+    TB.box(.09,.09,.09,CLK3,-.44,.40,.02,.79,true,EDGE2,.02);
+    TB.box(.09,.09,.09,CLK3,.44,.40,.02,.79,true,EDGE2,.02);
+    TB.box(.11,.11,.11,CLK2,-.14,.52,-.16,.79,true,EDGE,.024);
+    TB.box(.11,.11,.11,CLK2,.14,.52,-.16,.79,true,EDGE,.024);
+    TB.box(.20,.05,.30,CLK3,-.30,.42,.01,.24,true,EDGE2,.02);    /* pauldron plates */
+    TB.box(.20,.05,.30,CLK3,.30,.42,.01,-.24,true,EDGE2,.02);
+    for(let i=0;i<4;i++)                                         /* spine spikes */
+      TB.box(.10-.012*i,.10-.012*i,.10-.012*i,CLK2,0,.40-.14*i,-.235,.79,true,EDGE,.02);
+    TB.box(.05,.26,.03,CLK3,-.16,.24,-.222,.1,true,EDGE2,.014);  /* R24 — back ribs */
+    TB.box(.05,.26,.03,CLK3,.16,.24,-.222,-.1,true,EDGE2,.014);
+    TB.flush(to);
+    acc(to,.015,.15,.02,0,.115,.262,0,.4);                       /* red chest seam */
     acc(to,.02,.02,.02,-.36,.545,0,.79,.45);                     /* red spike tips */
     acc(to,.02,.02,.02,.36,.545,0,.79,.45);
-    for(let i=0;i<4;i++)                                         /* spine spikes */
-      obox(to,.10-.012*i,.10-.012*i,.10-.012*i,CLK2,0,.40-.14*i,-.235,.79,true,EDGE,.02);
     /* arms — joint drums, jag plates, bracer spikes, claw hands */
     const mkArm=s=>{const a=new THREE.Group();a.position.set(s*.34,.42,.02);
-      ocyl(a,.06,.09,CLK2,0,.015,0,"x",10,.014);                 /* shoulder joint */
-      obox(a,.13,.19,.15,CLK,0,-.085,0,0,true,EDGE,.026);        /* upper arm */
-      obox(a,.05,.11,.11,CLK2,s*.075,-.07,.01,s*.5,true,EDGE2,.016); /* jag plate */
-      ocyl(a,.052,.085,CLK3,0,-.205,0,"x",10,.012);              /* elbow drum */
-      obox(a,.11,.16,.13,CLK,0,-.30,0,0,true,EDGE,.024);         /* forearm */
-      obox(a,.045,.09,.05,CLK2,s*.065,-.27,.055,s*.6,true,EDGE2,.014); /* bracer spike */
-      obox(a,.115,.03,.135,CLK2,0,-.385,0,0,false);              /* wrist band */
-      obox(a,.11,.07,.11,CLK2,0,-.43,0,0,true,EDGE2,.02);        /* palm */
+      const AB=voxBatch();
+      AB.cyl(.06,.09,CLK2,0,.015,0,"x",10,.014);                 /* shoulder joint */
+      AB.box(.13,.19,.15,CLK,0,-.085,0,0,true,EDGE,.026);        /* upper arm */
+      AB.box(.05,.11,.11,CLK2,s*.075,-.07,.01,s*.5,true,EDGE2,.016); /* jag plate */
+      AB.cyl(.052,.085,CLK3,0,-.205,0,"x",10,.012);              /* elbow drum */
+      AB.box(.11,.16,.13,CLK,0,-.30,0,0,true,EDGE,.024);         /* forearm */
+      AB.box(.045,.09,.05,CLK2,s*.065,-.27,.055,s*.6,true,EDGE2,.014); /* bracer spike */
+      AB.box(.115,.03,.135,CLK2,0,-.385,0,0,false);              /* wrist band */
+      AB.box(.11,.07,.11,CLK2,0,-.43,0,0,true,EDGE2,.02);        /* palm */
       for(let i=0;i<3;i++){const px=(i-1)*.038;                  /* claws ×3, 2 segs */
-        obox(a,.028,.085,.032,CLK,px,-.485,.02,s*(.35-.12*i),true,EDGE2,.012);
-        obox(a,.02,.06,.024,CLK2,px+s*.014,-.545,.028,s*(.6-.14*i),true,EDGE2,.01)}
-      obox(a,.026,.07,.03,CLK,s*-.045,-.475,-.025,s*-.5,true,EDGE2,.012); /* thumb */
+        AB.box(.028,.085,.032,CLK,px,-.485,.02,s*(.35-.12*i),true,EDGE2,.012);
+        AB.box(.02,.06,.024,CLK2,px+s*.014,-.545,.028,s*(.6-.14*i),true,EDGE2,.01)}
+      AB.box(.026,.07,.03,CLK,s*-.045,-.475,-.025,s*-.5,true,EDGE2,.012); /* thumb */
+      AB.flush(a);
       to.add(a);return a};
     this.armL=mkArm(-1);this.armR=mkArm(1);
     const hd=this.head=new THREE.Group();hd.position.set(0,.52,.05);to.add(hd);
-    obox(hd,.42,.34,.40,CLK,0,.17,0,0,true,EDGE,.03);            /* hood */
-    obox(hd,.46,.10,.44,CLK2,0,.33,.01,0,true,EDGE,.03);         /* brim */
-    obox(hd,.30,.14,.30,CLK,0,.42,-.03,0,true,EDGE,.026);        /* peak */
-    obox(hd,.15,.12,.15,CLK2,0,.50,-.07,.4,true,EDGE2,.02);      /* crest spike */
-    obox(hd,.05,.26,.32,CLK2,-.235,.08,-.03,.12,true,EDGE2,.02); /* side flaps */
-    obox(hd,.05,.26,.32,CLK2,.235,.08,-.03,-.12,true,EDGE2,.02);
-    obox(hd,.26,.22,.06,CLK2,0,0,-.20,0,true,EDGE2,.022);        /* hood tail */
-    obox(hd,.38,.05,.045,CLK3,0,.30,.21,0,true,EDGE2,.016);      /* cowl brow */
-    obox(hd,.34,.04,.045,CLK2,0,.02,.20,0,true,EDGE2,.016);      /* chin guard */
+    const HB=voxBatch();
+    HB.box(.42,.34,.40,CLK,0,.17,0,0,true,EDGE,.03);             /* hood */
+    HB.box(.46,.10,.44,CLK2,0,.33,.01,0,true,EDGE,.03);          /* brim */
+    HB.box(.30,.14,.30,CLK,0,.42,-.03,0,true,EDGE,.026);         /* peak */
+    HB.box(.15,.12,.15,CLK2,0,.50,-.07,.4,true,EDGE2,.02);       /* crest spike */
+    HB.box(.05,.26,.32,CLK2,-.235,.08,-.03,.12,true,EDGE2,.02);  /* side flaps */
+    HB.box(.05,.26,.32,CLK2,.235,.08,-.03,-.12,true,EDGE2,.02);
+    HB.box(.014,.22,.02,EDGE2,-.263,.08,.06,.12,false);          /* R24 — stitching */
+    HB.box(.014,.22,.02,EDGE2,.263,.08,.06,-.12,false);
+    HB.box(.26,.22,.06,CLK2,0,0,-.20,0,true,EDGE2,.022);         /* hood tail */
+    HB.box(.38,.05,.045,CLK3,0,.30,.21,0,true,EDGE2,.016);       /* cowl brow */
+    HB.box(.34,.04,.045,CLK2,0,.02,.20,0,true,EDGE2,.016);       /* chin guard */
+    HB.flush(hd);
     acc(hd,.016,.045,.016,-.245,.315,.13,0,.4);                  /* hood pips */
     acc(hd,.016,.045,.016,.245,.315,.13,0,.4);
     /* face void — TRUE black (basic, unlit) so the pale slits float in it */
@@ -1415,8 +1738,7 @@ class Chr{
     this.eyes=[-.08,.08].map(ex=>{
       const e=new THREE.Mesh(new THREE.BoxGeometry(.09,.03,.02),
         new THREE.MeshBasicMaterial({color:RED,transparent:true,opacity:.8}));
-      e.position.set(ex,.17,.23);hd.add(e);
-      const eg=glowSprite(RED,.14,.22);eg.position.set(ex,.17,.25);hd.add(eg);
+      e.position.set(ex,.17,.23);hd.add(e);   /* R28 — slit halos gone */
       return e})}
   update(t,dt){
     const m=this._m||"idle";this._m=null;
@@ -1532,18 +1854,18 @@ class Chr{
       this.ring.visible=this.pivot.visible&&op>.02}}
 }
 
-/* particles — white spark pool in world space */
+/* particles — white spark pool in world space. R28 — the per-spark 2.3u
+   halo sprite is GONE (a burst used to stack dozens of additive quads over
+   one point — the worst transient overdraw in the deck); the hot additive
+   box IS the spark. */
 const sparkGeo=new THREE.BoxGeometry(.09,.09,.09);
 const sparks=Array.from({length:70},()=>{const m=new THREE.Mesh(sparkGeo,
   new THREE.MeshBasicMaterial({color:WHITE,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
-  const halo=new THREE.Sprite(new THREE.SpriteMaterial(
-    {map:GLOW,color:WHITE,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
-  halo.scale.setScalar(2.3);m.add(halo);
   m.visible=false;scene.add(m);
-  return{m,halo,born:-1,life:0,vel:new THREE.Vector3(),grav:5,sz:1}});
+  return{m,born:-1,life:0,vel:new THREE.Vector3(),grav:5,sz:1}});
 let sparkI=0;
 function burst(t,x,y,z,n,spd,grav=5,col=WHITE){for(let i=0;i<n;i++){const p=sparks[sparkI++%sparks.length];
-  p.m.material.color.setHex(col);p.halo.material.color.setHex(col);   /* R12 */
+  p.m.material.color.setHex(col);   /* R12 */
   p.born=t;p.life=.4+Math.random()*.45;p.grav=grav*(.75+Math.random()*.5);
   p.vel.set((Math.random()-.5)*2,.6+Math.random(),(Math.random()-.5)*2).normalize()
     .multiplyScalar(spd*(.55+Math.random()*.8));
@@ -1558,7 +1880,6 @@ function stepParticles(t,dt){
     p.vel.y-=p.grav*dt;p.vel.multiplyScalar(Math.max(0,1-1.6*dt));
     const u=a/p.life,fade=1-u*u;
     p.m.material.opacity=Math.min(1,fade*1.1);
-    p.halo.material.opacity=.45*fade*fade;
     p.m.scale.setScalar(Math.max(.05,p.sz*(.55+.45*(1-u))));
     p.m.rotation.x+=dt*6;p.m.rotation.y+=dt*5}}
 
@@ -1607,7 +1928,8 @@ if(THREE.GLTFLoader&&window.GUARDIAN_LEDGER_GLB){
 }
 
 /* ─────────────────────────────── SLIDES ─────────────────────────────────── */
-/* R14 — scene 4 (VOICE, 22s) inserted after NO SAFETY NET; 11 scenes, 3:54 */
+/* R14 — scene 4 (VOICE, 22s) inserted after NO SAFETY NET */
+/* R27 — the R21 LIVE DEMO video scene is removed; 11 scenes, ~3:54 in ?auto */
 const DURS=[15,18,18,22,30,26,24,22,26,18,15];
 const cume=[];DURS.reduce((a,d,i)=>(cume[i]=a+d,a+d),0);
 const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
@@ -1783,11 +2105,17 @@ const S3M={moon:[-4.5,1.9,-2],aave:[0,2.1,-3],comp:[4.5,2.0,-2]};
 
 /* 0 · HOOK — a calm vault in dust; the GUARDIAN presents it (R9) */
 addSet(0,(g)=>{
+  makeEnv(g,{look:"cyan",seed:101});          /* R23 — calm cyan air + stars */
   dustGrid(g,{op:.3});
   const ring=circleLine(6,GRAY,.12);ring.rotation.x=-Math.PI/2;ring.position.y=.02;g.add(ring);
   const v=makeVault(g,{s:2.4});
   const host=new Chr(g,"guardian",1.15);host.setPos(3.2,2.6);host.lookTo(.26);
+  /* R25 — the calm breath: a few cyan motes rise off the guarded safe (the
+     HOOK's only ambient motion beyond the pendulum — bookends s12's night) */
+  const breath=makeRisers(g,{n:6,sx:2.1,sz:1.5,y0:.4,y1:4.6,op:.10,
+    speed:.13,seed:143});
   return(t,dt,tl,active)=>{v.update(t);v.grp.position.y=1.8+.14*Math.sin(t*.6);
+    breath.update(t,1);
     ring.material.opacity=.09+.05*Math.sin(t*.55);   /* R17 — ground ring breathes */
     /* the host greets the room, then sweeps a hand to the vault */
     host.play(tl<1.6?"idle":tl<4.6?"wave":tl<11?"present":"idle");
@@ -1802,12 +2130,14 @@ addSet(0,(g)=>{
    off and cascades down on it. The half-buried safe stays in the eye; the
    GUARDIAN reaches in from the rim. (makeStorm survives — scene 4 uses it.) */
 addSet(1,(g,X)=>{
+  /* R23 — cold blue data-void beyond the wall; a denser far dust field */
+  makeEnv(g,{look:"blue",seed:103,stars:420,starCol:0x9db4de,starOp:.32});
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,90),
     new THREE.MeshStandardMaterial({color:0x101010,metalness:.2,roughness:.92}));
   ground.rotation.x=-Math.PI/2;g.add(ground);
   dustGrid(g,{op:.16,seed:5,y:.04});
   const v=makeVault(g,{s:2.1,y:.72,op:.7});      /* half-buried, listing */
-  v.grp.rotation.z=.09;v.core.scale.setScalar(3.2);  /* tighter halo in the eye */
+  v.grp.rotation.z=.09;                          /* R28 — halo quad gone */
   const wall=makeDashWall(g);
   /* R9 — the AGENT drowns under the wall: staggering, arms flailing; the
      GUARDIAN watches from the rim, then reaches out on NO HUMAN CAN WATCH */
@@ -1847,6 +2177,10 @@ addSet(1,(g,X)=>{
    tumble into the dark. A third shot watches the second dive from INSIDE
    the void, looking up at the rim. */
 addSet(2,(g,X)=>{
+  /* R23 — the red under-glow lives DOWN in the void (look:void); sparse dim
+     embers-as-stars reach below the rim so the drop has depth to die into */
+  makeEnv(g,{look:"void",seed:105,stars:260,starCol:0xb98a8a,starOp:.28,
+    yMin:-30,yMax:26});
   const R=rng(21);
   /* the shelf — a cliff with mass; top face at y=0 */
   const rockM=new THREE.MeshStandardMaterial({color:0x262626,metalness:.26,roughness:.82});
@@ -1889,17 +2223,20 @@ addSet(2,(g,X)=>{
      dimmer alloy so the rail supports the story instead of diagramming it. */
   const railM=new THREE.MeshStandardMaterial({color:0x484848,metalness:.8,roughness:.4,
     emissive:0xffffff,emissiveIntensity:.055});
-  const postG=new THREE.CylinderGeometry(.035,.045,1,8);
-  for(const[pz,h,tx,tz]of[[-3.35,.56,.04,-.06],[-2.3,.62,-.03,.02],[-1.2,.5,.3,-.1],
-      [1.4,.44,-.5,.16],[2.9,.58,-.08,.05]]){
-    const p=new THREE.Mesh(postG,railM);p.scale.y=h;p.position.set(1.62,h/2,pz);
-    p.rotation.x=tx;p.rotation.z=tz;g.add(p)}
+  /* R28 — the 5 static posts + 4 static rails merge to ONE mesh on railM
+     (same geometry, baked transforms); only the two dangling stubs stay
+     live meshes — they swing in the updraft */
+  {const rp=[];
+   for(const[pz,h,tx,tz]of[[-3.35,.56,.04,-.06],[-2.3,.62,-.03,.02],[-1.2,.5,.3,-.1],
+       [1.4,.44,-.5,.16],[2.9,.58,-.08,.05]])
+     rp.push({g:bakeGeo(new THREE.CylinderGeometry(.035,.045,h,8),1.62,h/2,pz,tx,0,tz)});
+   const bar=(z1,z2,y,sag=0)=>rp.push({g:bakeGeo(
+     new THREE.CylinderGeometry(.022,.022,Math.abs(z2-z1),8),
+     1.62,y,(z1+z2)/2,Math.PI/2+sag,0,0)});
+   bar(-3.35,-1.15,.58,.03);bar(-3.35,-1.2,.34,-.02);   /* near span: top + mid */
+   bar(1.5,2.95,.5,-.09);bar(1.42,2.9,.28,.05);         /* far span, bent down */
+   g.add(new THREE.Mesh(mergeParts(rp,false),railM))}
   const barG=new THREE.CylinderGeometry(.022,.022,1,8);
-  const bar=(z1,z2,y,sag=0)=>{const b=new THREE.Mesh(barG,railM);
-    b.scale.y=Math.abs(z2-z1);b.position.set(1.62,y,(z1+z2)/2);
-    b.rotation.x=Math.PI/2+sag;g.add(b);return b};
-  bar(-3.35,-1.15,.58,.03);bar(-3.35,-1.2,.34,-.02);   /* near span: top + mid */
-  bar(1.5,2.95,.5,-.09);bar(1.42,2.9,.28,.05);         /* far span, bent down */
   const stub1=new THREE.Mesh(barG,railM);stub1.scale.y=.8;g.add(stub1);   /* dangling */
   const stub2=new THREE.Mesh(barG,railM);stub2.scale.y=.55;g.add(stub2);
   /* dust on the ledge only */
@@ -1917,9 +2254,10 @@ addSet(2,(g,X)=>{
      R12: the void is RED — this is where money dies */
   const embers=[];for(let i=0;i<9;i++){const e=glowSprite(RED,.5,.14);g.add(e);
     embers.push({e,x:3.4+R()*5,z:(R()-.5)*4.4,ph:R()*9,sp:.55+R()*.4})}
-  /* deep mist — huge dim glows far below; the void has air, not vacuum */
-  const mist=[];for(let i=0;i<4;i++){const m=glowSprite(RED,6+R()*3.4,.045);g.add(m);
-    mist.push({m,x:4+R()*5,y:-4.5-R()*4.5,z:(R()-.5)*4,ph:R()*7})}
+  /* R28 — the deep mist (4× 6-9u additive quads, the scene's biggest
+     overdraw) is REMOVED: the R23 void shell already glows red down in the
+     pit. The rng cursor is burned so the coin scatter stays byte-identical. */
+  for(let i=0;i<20;i++)R();
   /* R18 — CLEAN USDC coins. R16's face was broken two ways: (a) its draw
      callback did a bare translate(64,64), and board()'s font-redraw re-runs
      the callback on the SAME context — the transform accumulated and shifted
@@ -2009,9 +2347,6 @@ addSet(2,(g,X)=>{
     for(const e of embers){const u=((t*e.sp+e.ph)%6)/6;
       e.e.position.set(e.x,1.5-u*11,e.z);
       e.e.material.opacity=.2*Math.sin(u*Math.PI)}
-    for(const m of mist){m.m.position.set(m.x+.4*Math.sin(t*.14+m.ph),
-      m.y+.3*Math.sin(t*.11+m.ph*2),m.z);
-      m.m.material.opacity=.06+.02*Math.sin(t*.23+m.ph)}
     pv=ph}});
 
 /* 3 · VOICE — R14: voice is the control layer. The scene opens on a GHOST of
@@ -2023,10 +2358,12 @@ addSet(2,(g,X)=>{
    chat bubbles; the GUARDIAN attends the orb and presents the answer; the
    AGENT is dispatched across the frame on "deploying". */
 addSet(3,(g,X)=>{
+  /* R23 — AI-blue air behind the ghost wall and the listening orb */
+  makeEnv(g,{look:"blue",seed:107,stars:340,starCol:0x9db4de,starOp:.34});
   dustGrid(g,{op:.18,seed:33});
   const ring=circleLine(2.1,GRAY,.16);ring.rotation.x=-Math.PI/2;
   ring.position.y=.02;g.add(ring);
-  const ped=glowSprite(CYAN,3.6,.05);ped.position.set(0,.2,0);g.add(ped);
+  /* R28 — the 3.6u pedestal glow quad is gone; the ring grounds the orb */
   /* the ghost wall — 58 panels on three arcs behind the orb, wearing the
      SAME 12 chart faces scene 2 hangs (seed 61 → identical pixels) */
   const R=rng(77);
@@ -2056,11 +2393,17 @@ addSet(3,(g,X)=>{
   orb.grp.children[0].material.color.setHex(0x74d9f2);  /* wire shell */
   orb.grp.children[1].material.color.setHex(0xcdf1fb);  /* points */
   orb.grp.children[2].material.color.setHex(CYAN);      /* core glow */
-  const speechGlow=glowSprite(CYAN,5.4,0);speechGlow.position.set(0,2.6,0);
-  g.add(speechGlow);
+  /* R28 — the 5.4u speech aura quad is gone: rings, waveform and the orb's
+     own amplitude/scale already speak the envelope */
   /* live-session rings — billboarded, breathing with the voice */
   const rr1=circleLine(1.95,CYAN,0),rr2=circleLine(2.32,0x9adfff,0);
   rr1.position.set(0,2.6,0);rr2.position.set(0,2.6,0);g.add(rr1,rr2);
+  /* R25 — the words pour IN: while YOU speak, a thin spiral of cyan motes
+     drains into the orb — the listening made visible. (The reply needs no
+     mirror stream: the waveform, rings and glow already speak back.) */
+  const inR=rng(79),inMotes=[];
+  for(let i=0;i<8;i++){const s=glowSprite(CYAN,.30+inR()*.2,0);s.visible=false;
+    g.add(s);inMotes.push({s,off:i/8+inR()*.06,a0:inR()*6.283,w:.7+inR()*.5})}
   /* the WAVEFORM — a row of live bars under the orb (symmetric around a
      baseline; amplitude is idle-ripple + the active speech envelope) */
   const WFN=48;
@@ -2122,8 +2465,14 @@ addSet(3,(g,X)=>{
     orb.grp.scale.setScalar(.55+.45*eInOut(absorbK)+.05*speech
       +.015*Math.sin(t*7.3)*speech);
     orb.update(t);
-    speechGlow.material.opacity=.08*wfIn+.30*speech
-      +.16*absorbK*(1-wfIn)*(.6+.4*Math.sin(t*11));
+    /* R25 — intake spiral rides the YOU envelope only */
+    for(const m of inMotes){const u=(t*.42+m.off)%1;
+      const o=.5*Math.sin(u*Math.PI)*U;
+      m.s.visible=o>.02;
+      if(m.s.visible){const ang=m.a0+t*m.w+u*2.6,r2=3.8*(1-u*.92);
+        m.s.position.set(Math.cos(ang)*r2,2.6+Math.sin(ang*1.31+m.a0)*r2*.42,
+          Math.sin(ang)*r2*.8);
+        m.s.material.opacity=o}}
     rr1.quaternion.copy(camera.quaternion);rr1.rotateZ(t*.3);
     rr2.quaternion.copy(camera.quaternion);rr2.rotateZ(-t*.21);
     rr1.material.opacity=(.10+.26*speech)*wfIn;
@@ -2177,6 +2526,9 @@ addSet(3,(g,X)=>{
    them into the vortex. The scope drops, sweeps, locks — one aimed tracer,
    one clean hit on Compound. */
 addSet(4,(g,X)=>{
+  /* R23 — a light cyan horizon behind the data-noise (the noise field is
+     already dense — the star field stays sparse so nothing competes) */
+  makeEnv(g,{look:"cyan",seed:109,stars:280,starOp:.28});
   /* R16 — the gray storm+shard backdrop is DATA-NOISE: tickers, figures and
      sparkline fragments receding into the fog behind the market wall — the
      thing graphscout literally cuts through. (makeStorm/makeShards stay
@@ -2235,7 +2587,9 @@ addSet(4,(g,X)=>{
     const grp=new THREE.Group();grp.position.set(p[0],p[1],p[2]);g.add(grp);
     const tok=new THREE.Group();grp.add(tok);
     const bodyM=new THREE.MeshStandardMaterial({color:0x262626,metalness:.5,roughness:.44,
-      emissive:acc,emissiveIntensity:.02+.025*bright});
+      /* R28 — a touch more emissive: the halo quad is gone, the body sheen
+         carries the "lit" read at zero fillrate */
+      emissive:acc,emissiveIntensity:.035+.04*bright});
     /* R6 — beveled frustum (front face narrower than the back): the ring of
        angled facets catches the light so the token is dimensional at rest,
        not just when the wobble walks a specular across it */
@@ -2245,7 +2599,7 @@ addSet(4,(g,X)=>{
       new THREE.LineBasicMaterial({color:WHITE,transparent:true,opacity:.35+.45*bright}));
     edge.rotation.x=Math.PI/2;
     const rimM=new THREE.MeshStandardMaterial({color:0x8f8f8f,metalness:.85,roughness:.28,
-      emissive:acc,emissiveIntensity:.17+.2*bright});
+      emissive:acc,emissiveIntensity:.23+.26*bright});   /* R28 — halo comp */
     const rim=new THREE.Mesh(new THREE.TorusGeometry(r*.98,r*.042,10,48),rimM);
     /* R6 raised boss → R16 round MEDALLION: same relief read (frustum sides
        catch light), now carrying the protocol's MARK as a canvas inlay on
@@ -2266,9 +2620,17 @@ addSet(4,(g,X)=>{
     faceG.add(f1,f2);
     const er1=circleLine(r*.585,WHITE,.22+.2*bright);er1.position.z=r*.232;
     const er2=circleLine(r*.585,WHITE,.14);er2.position.z=-r*.232;
-    tok.add(body,edge,rim,boss,boss2,er1,er2,faceG);
+    /* R24 — reeded edge: 36 tick teeth machined around the rim, merged to
+       ONE mesh riding rimM, so the lock flare (and the loser dim) lights
+       the reeding exactly like the rim it decorates */
+    const reedP=[];for(let i2=0;i2<36;i2++){const ra=i2/36*Math.PI*2;
+      reedP.push({g:bakeGeo(new THREE.BoxGeometry(r*.085,r*.026,r*.05),
+        Math.cos(ra)*r*1.005,Math.sin(ra)*r*1.005,0,0,0,ra)})}
+    const reed=new THREE.Mesh(mergeParts(reedP,false),rimM);
+    tok.add(body,edge,rim,boss,boss2,er1,er2,faceG,reed);
     const ring=circleLine(r*1.3,acc,.3+.3*bright);grp.add(ring);
-    const halo=glowSprite(acc,r*2.7,.12+.16*bright);halo.renderOrder=-1;grp.add(halo);
+    /* R28 — the r*2.7 market halo quad is not drawn (API stub kept) */
+    const halo=glowSprite(acc,r*2.7,.12+.16*bright);halo.renderOrder=-1;
     const lab=label?labelBoard(grp,{x:0,y:-r*1.3-.6,z:0,w:2.1,text:label,sub,bright,star,
       subCol:acc===RED?"rgba(255,115,115,.95)":null,
       starCol:star?"rgba(53,224,255,.95)":null}):null;
@@ -2299,6 +2661,15 @@ addSet(4,(g,X)=>{
     return{grp,ring,ring2,core}}
   const noise=[[-6.5,3.4,-4.5],[-2,3.8,-5.5],[2,3.5,-6],[6.8,3.2,-4.4],[-1,.7,-1],[7.2,1,-1.4]]
     .map(p=>noiseTarget(p,.42,.25));
+  /* R25 — the READ made visible: while the scope sweeps, a thin stream of
+     cyan sample-motes drains from the market under the reticle back into
+     the agent — graphscout pulling live risk out of the wall. Follows the
+     reticle's own schedule; dies at lock (the reading is done). */
+  const rdR=rng(63),rdMotes=[];
+  for(let i=0;i<6;i++){const s=glowSprite(CYAN,.26+rdR()*.16,0);s.visible=false;
+    g.add(s);rdMotes.push({s,off:i/6+rdR()*.08,j:rdR()*6.283})}
+  const _rdA=new THREE.Vector3(-5.15,1.7,2.35),
+    _rdT=new THREE.Vector3(),_rdP=new THREE.Vector3();
   /* 3D tracer fire — a hot head, an additive comet streak axis-billboarded to
      the lens, and a fat dim wake. Volley rounds fly PAST the wall and die
      deep inside the storm; the aimed round terminates ON Compound. */
@@ -2373,6 +2744,26 @@ addSet(4,(g,X)=>{
     noise.forEach((n,i)=>{n.ring.material.opacity=(.25+.05*Math.sin(t*1.3+i*1.7))*dimK;
       n.ring2.material.opacity=(.15+.03*Math.sin(t*1.7+i*2.3))*dimK;
       n.core.material.opacity=.12*dimK});
+    /* R25 — sample-stream: reticle's market → the agent, on the sweep only */
+    const rdK=seg(ph,13.2,14)*(1-seg(ph,20.5,21.1));
+    if(rdK>0){
+      if(ph<15.6)_rdT.set(S3M.moon[0],S3M.moon[1],S3M.moon[2]);
+      else if(ph<16.4){const k2=eInOut(seg(ph,15.6,16.4));
+        _rdT.set(lerp(S3M.moon[0],S3M.aave[0],k2),lerp(S3M.moon[1],S3M.aave[1],k2),
+          lerp(S3M.moon[2],S3M.aave[2],k2))}
+      else if(ph<18.8)_rdT.set(S3M.aave[0],S3M.aave[1],S3M.aave[2]);
+      else if(ph<19.6){const k2=eInOut(seg(ph,18.8,19.6));
+        _rdT.set(lerp(S3M.aave[0],S3M.comp[0],k2),lerp(S3M.aave[1],S3M.comp[1],k2),
+          lerp(S3M.aave[2],S3M.comp[2],k2))}
+      else _rdT.set(S3M.comp[0],S3M.comp[1],S3M.comp[2]);
+      for(const m of rdMotes){const u=(t*.55+m.off)%1;
+        _rdP.lerpVectors(_rdT,_rdA,u);
+        const o=.45*Math.sin(u*Math.PI)*rdK;
+        m.s.visible=o>.02;
+        if(m.s.visible){m.s.position.set(_rdP.x+.1*Math.sin(t*2.3+m.j),
+          _rdP.y+.1*Math.sin(t*1.9+m.j*2),_rdP.z+.08*Math.cos(t*2.1+m.j));
+          m.s.material.opacity=o}}}
+    else for(const m of rdMotes)m.s.visible=false;
     /* blind volley — tracers scatter past the wall into the storm */
     for(const tr of trPool)tr.head.visible=tr.core.visible=tr.wake.visible=false;
     let ti=0;
@@ -2415,7 +2806,7 @@ addSet(4,(g,X)=>{
        ranked DOM rows in the OTS frame and were bleeding through the panel */
     const labDim=lerp(1,.14,seg(ph,21,22));
     for(const m of[moon,aave]){m.ring.material.opacity=m.ringOp*lockDim;
-      m.edge.material.opacity=m.edgeOp*lockDim;m.halo.material.opacity=m.haloOp*lockDim;
+      m.edge.material.opacity=m.edgeOp*lockDim;
       m.rimM.emissiveIntensity=m.rimE*lockDim;
       m.faceM.opacity=.96*lockDim;             /* R16 — loser marks step back */
       if(m.lab)m.lab.material.opacity=labDim}
@@ -2424,7 +2815,6 @@ addSet(4,(g,X)=>{
     const hitF=win(ph,22.6,1.2);
     comp.rimM.emissiveIntensity=comp.rimE+.38*seg(ph,21,21.6)+1.1*hitF;
     comp.bodyM.emissiveIntensity=comp.bodyE+.05*seg(ph,21,21.6)+.22*hitF;
-    comp.halo.material.opacity=comp.haloOp+.26*seg(ph,21,21.6)+.3*hitF;
     for(const b of bill)b.quaternion.copy(camera.quaternion);
     /* R10 — the agent acts the arc: wild point-fire at each round's bearing →
        overwhelmed as everything misses → calmed by the drop → aim + HOLD,
@@ -2463,6 +2853,7 @@ addSet(4,(g,X)=>{
 
 /* 5 · THE MANDATE — signature, cage, scoped key */
 addSet(5,(g,X)=>{
+  makeEnv(g,{look:"cyan",seed:111});   /* R23 — the mandate's calm cyan room */
   dustGrid(g,{op:.24,seed:9});
   const v=makeVault(g,{x:-4.5,s:2.2});
   const cage=makeCage(g,{x:-4.5,r:3.1});
@@ -2471,17 +2862,39 @@ addSet(5,(g,X)=>{
      comet TAIL, the arriving pulse STAMPS the boundary (an expanding ground
      ring under the snapping cage), and the scoped key is MINTED — six blue
      motes spiral inward and collapse into it just before it scales in */
-  const sigAt=k=>[lerp(7,-4.5,eInOut(k)),lerp(2.1,1.8,k),lerp(1.9,0,k)];
+  const _sig=[0,0,0];                 /* R28 — scratch, no per-frame arrays */
+  const sigAt=k=>(_sig[0]=lerp(7,-4.5,eInOut(k)),_sig[1]=lerp(2.1,1.8,k),
+    _sig[2]=lerp(1.9,0,k),_sig);
   const ptrail=Array.from({length:5},(_,i)=>{const s=glowSprite(CYAN,.9-.13*i,0);
     g.add(s);return s});
   const snapRing=circleLine(1,CYAN,0);snapRing.rotation.x=-Math.PI/2;
   snapRing.position.set(-4.5,.05,0);snapRing.visible=false;g.add(snapRing);
+  /* R25 — the boundary, DRAWN: after the stamp pulse dies, a quiet ticked
+     survey ring stays on the floor under the cage — the mandate reads as a
+     measured perimeter, not a special effect. 2 draws (circle + ticks). */
+  const bndR=circleLine(3.42,0xcdeef8,0);bndR.rotation.x=-Math.PI/2;
+  bndR.position.set(-4.5,.04,0);g.add(bndR);
+  const tickPts=[];
+  for(let i=0;i<36;i++){const a2=i/36*Math.PI*2,M=i%9===0,r1=3.42-(M?.30:.14);
+    tickPts.push(new THREE.Vector3(Math.cos(a2)*r1,0,Math.sin(a2)*r1),
+      new THREE.Vector3(Math.cos(a2)*3.42,0,Math.sin(a2)*3.42))}
+  const bndT=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPts),
+    new THREE.LineBasicMaterial({color:0xcdeef8,transparent:true,opacity:0}));
+  bndT.position.set(-4.5,.04,0);g.add(bndT);
   const mint=Array.from({length:6},()=>{const s=glowSprite(EBLUE,.62,0);
     g.add(s);return s});
   const key=new THREE.Group();key.position.set(-3.1,1.6,.7);key.scale.setScalar(.001);g.add(key);
   const ko=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.OctahedronGeometry(.32)),
     new THREE.LineBasicMaterial({color:WHITE,transparent:true,opacity:.95}));
-  key.add(ko,glowSprite(EBLUE,1.3,.7));              /* the agent's scoped key — AI blue */
+  key.add(ko);                        /* the agent's scoped key — AI blue.
+     R28 — the 1.3u key halo quad is gone; the lit core (below, .34→.45)
+     keeps the key reading powered */
+  /* R24 — the key reads machined, not schematic: a lit blue core inside the
+     wire cut, and a fine equatorial collar that turns with it */
+  key.add(new THREE.Mesh(new THREE.OctahedronGeometry(.185),
+    new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.45,
+      blending:THREE.AdditiveBlending,depthWrite:false})));
+  {const kr=circleLine(.42,0xcdeef8,.5);kr.rotation.x=Math.PI/2;key.add(kr)}
   const tetherGeo=new THREE.BufferGeometry().setFromPoints(
     [new THREE.Vector3(),new THREE.Vector3()]);
   const tether=new THREE.Line(tetherGeo,
@@ -2530,10 +2943,21 @@ addSet(5,(g,X)=>{
       snapRing.material.opacity=.55*(1-sr)}
     const ck2=seg(ph,6.7,7.5);
     if(ck2>0){cage.grp.scale.setScalar(lerp(1.9,1,eOutBack(ck2)));
-      cage.wire.material.opacity=.55*seg(ph,6.7,7.3)+.08*Math.sin(t*1.3);
-      cage.halo.material.opacity=.10+.08*win(ph,6.7,1.2)}
-    else{cage.wire.material.opacity=0;cage.halo.material.opacity=0}
+      cage.wire.material.opacity=.55*seg(ph,6.7,7.3)+.08*Math.sin(t*1.3)}
+    else cage.wire.material.opacity=0;
+    /* R24 — the boundary's inner engineering wakes with the snap: counter-
+       rotating inner shell, whisper facet skin, vertex studs (makeCage) */
+    cage.inner.visible=cage.facet.visible=cage.studs.visible=ck2>0;
+    if(ck2>0){cage.inner.rotation.y=-t*.26;
+      cage.inner.material.opacity=.13*seg(ph,6.7,7.3)+.06*win(ph,6.7,1.2);
+      cage.facet.material.opacity=.02*seg(ph,6.7,7.3)+.05*win(ph,6.7,1.2);
+      cage.studs.material.opacity=.12*seg(ph,6.7,7.3)}
     cage.grp.rotation.y=t*.1;
+    /* R25 — the drawn boundary survives the stamp pulse: a still, ticked
+       perimeter (surveyed, not spinning) that breathes a whisper */
+    const bnd=seg(ph,7.0,8.2);
+    bndR.material.opacity=(.15+.03*Math.sin(t*1.1))*bnd;
+    bndT.material.opacity=.20*bnd;
     /* R13 — key MINT: six blue motes spiral in and collapse into the point
        where the scoped key is about to materialize (inside the boundary) */
     const mk=seg(ph,7.9,8.6);
@@ -2593,6 +3017,8 @@ addSet(5,(g,X)=>{
    ground ripples, an emissive inner band, and two counter-precessing gyro
    rings that spin up as the retreat slams home. */
 addSet(6,(g,X)=>{
+  /* R23 — money-in-motion blue behind the market skyline */
+  makeEnv(g,{look:"blue",seed:113,stars:380,starCol:0x9db4de,starOp:.34});
   dustGrid(g,{op:.2,seed:13});
   const v=makeVault(g,{x:-4,s:2});
   const cage=makeCage(g,{x:-4,r:2.7});
@@ -2600,6 +3026,11 @@ addSet(6,(g,X)=>{
     new THREE.LineBasicMaterial({color:GRAY,transparent:true,opacity:.06}));
   bound.position.set(0,1.6,0);g.add(bound);
   const bill=[];
+  /* R24 — skyline trim: corner ribs + floor bands + a roof lip per column,
+     merged to ONE mesh each on one shared material (3 extra draws total) —
+     the markets read as engineered towers, not extruded boxes */
+  const trimM=new THREE.MeshStandardMaterial({color:0x353535,metalness:.55,
+    roughness:.45,emissive:0xffffff,emissiveIntensity:.04});
   function pillar(x,z,h,name,sub,bright,star,acc=CYAN){
     const grp=new THREE.Group();grp.position.set(x,0,z);g.add(grp);
     /* solid matte-metal column inside the wire frame — the rig shades it, so
@@ -2609,8 +3040,21 @@ addSet(6,(g,X)=>{
       new THREE.MeshStandardMaterial({color:0x1e1e1e,metalness:.5,roughness:.5,
         emissive:acc,emissiveIntensity:.012*bright}));
     body.position.y=h/2;grp.add(body);
+    const tp=[];
+    for(const sx of[-1,1])for(const sz of[-1,1])
+      tp.push({g:bakeGeo(new THREE.BoxGeometry(.075,h*.97,.075),sx*.60,h/2,sz*.60)});
+    for(let i2=1;i2<5;i2++)
+      tp.push({g:bakeGeo(new THREE.BoxGeometry(1.27,.025,1.27),0,h*i2/5,0)});
+    tp.push({g:bakeGeo(new THREE.BoxGeometry(1.31,.05,1.31),0,h*.985,0)});
+    grp.add(new THREE.Mesh(mergeParts(tp,false),trimM));
     const col=lineBox(1.3,h,1.3,WHITE,.3+.45*bright);col.position.y=h/2;grp.add(col);
-    const top=glowSprite(acc,1.6,.25+.4*bright);top.position.y=h;grp.add(top);
+    /* R28 — the 1.6u rooftop glow quad becomes a small additive LAMP mesh:
+       same beacon read (all the opacity drives below still hit .material),
+       a fraction of the fillrate */
+    const top=new THREE.Mesh(new THREE.SphereGeometry(.11,10,8),
+      new THREE.MeshBasicMaterial({color:acc,transparent:true,opacity:.25+.4*bright,
+        blending:THREE.AdditiveBlending,depthWrite:false}));
+    top.position.y=h;grp.add(top);
     const lab=labelBoard(grp,{x:0,y:h+.95,z:0,w:2.05,text:name,sub,bright,star,
       subCol:acc===RED?"rgba(255,115,115,.95)":null});
     bill.push(lab);
@@ -2618,6 +3062,11 @@ addSet(6,(g,X)=>{
   const comp=pillar(2.5,0,3,"COMPOUND","· 82",1,true,CYAN);
   const aave=pillar(5.5,-1.5,2.7,"AAVE","· 78",.7,false,CYAN);
   const moon=pillar(7.6,.8,2.4,"MOONWELL","watch · 69",.45,false,RED);
+  /* R25 — yield, visible: while funds sit in a market, faint cyan motes
+     tick UP off its roof (money working). The column re-parks Compound →
+     Aave on the ROTATE beat and dies with the evacuation. */
+  const earn=makeRisers(g,{n:7,x:2.5,z:0,sx:.6,sz:.6,y0:3.05,y1:4.8,
+    size:.30,op:.12,speed:.20,seed:145});
   /* the safe haven — R3: a 3D gyro-gate far from the markets */
   const haven=new THREE.Group();haven.position.set(-10,0,0);g.add(haven);
   const hDisc=new THREE.Mesh(new THREE.CircleGeometry(2.25,48),
@@ -2631,16 +3080,21 @@ addSet(6,(g,X)=>{
   const hPad=new THREE.Mesh(new THREE.TorusGeometry(1.32,.08,14,72),hPadM);
   hPad.rotation.x=Math.PI/2;hPad.position.y=1.02;haven.add(hPad);
   const hInM=new THREE.MeshStandardMaterial({color:0x3a3a3a,metalness:.6,roughness:.4,
-    emissive:CYAN,emissiveIntensity:.34});
+    emissive:CYAN,emissiveIntensity:.40});   /* R28 — gate glow-quad comp */
   const hIn=new THREE.Mesh(new THREE.TorusGeometry(.86,.035,10,56),hInM);
   hIn.rotation.x=Math.PI/2;hIn.position.y=1.02;haven.add(hIn);
+  /* R24 — mooring clamps proud of the landing torus: ONE merged draw riding
+     hPadM, so the wake/settle lighting carries them for free */
+  {const ps=[];for(let i2=0;i2<10;i2++){const pa=i2/10*Math.PI*2;
+    ps.push({g:bakeGeo(new THREE.BoxGeometry(.09,.07,.06),
+      Math.cos(pa)*1.32,1.075,Math.sin(pa)*1.32,0,-pa,0)})}
+   haven.add(new THREE.Mesh(mergeParts(ps,false),hPadM))}
   const hGy1=new THREE.Group(),hGy2=new THREE.Group();
   hGy1.position.y=1.02;hGy2.position.y=1.02;haven.add(hGy1,hGy2);
   const gy1=circleLine(1.58,CYAN,.28);hGy1.add(gy1);
   const gy2=circleLine(1.44,GRAY,.2);gy2.rotation.x=.42;hGy2.add(gy2);
-  const hg=glowSprite(CYAN,2.9,.16);hg.position.y=1.05;haven.add(hg);
-  const hBeam=[[1.6,1.9,.10],[2.3,1.45,.06],[3,1.05,.035]].map(([y,s,o])=>{
-    const b=glowSprite(CYAN,s,o);b.position.y=y;haven.add(b);return{b,o}});
+  /* R28 — the 2.9u gate aura + the 3-quad beam column are gone: the torus
+     pair's emissive (bumped above) and the gyro rings carry the gate */
   const aRing=circleLine(1,CYAN,0);aRing.rotation.x=-Math.PI/2;aRing.position.y=.06;
   aRing.visible=false;haven.add(aRing);
   const hlab=labelBoard(haven,{x:0,y:3.1,z:0,w:2.2,text:"SAFE HAVEN",sub:"",bright:.85});
@@ -2662,7 +3116,7 @@ addSet(6,(g,X)=>{
      re-points on rotate, whips round to shield on the depeg, then RUNS the
      retreat home with the stream and presents the gate as it settles */
   const agent=new Chr(g,"agent",1.05);agent.setPos(.7,2.3);
-  const _hd=new THREE.Vector3();
+  const _hd=new THREE.Vector3(),_pp=new THREE.Vector3(),_pt2=new THREE.Vector3();
   let pv=-1;
   return(t,dt,tl,active)=>{const ph=tl%LOOPS[6];
     if(ph<pv)pv=-0.001;
@@ -2673,13 +3127,16 @@ addSet(6,(g,X)=>{
        R12 — it burns RED (danger), falling back to the cyan idle as it fades */
     const dsm=seg(ph,12.3,13.2)*(1-seg(ph,16.8,18.2));
     v.update(t,1,dsm,clamp01(dsm*4));
-    cage.wire.material.opacity=.3+.05*Math.sin(t*1.2);cage.halo.material.opacity=.06;
+    cage.wire.material.opacity=.3+.05*Math.sin(t*1.2);
     cage.grp.rotation.y=t*.08;
+    cage.inner.visible=true;                 /* R24 — faint counter shell */
+    cage.inner.rotation.y=-t*.2;
+    cage.inner.material.opacity=.09+.02*Math.sin(t*1.1);
     bound.rotation.y=t*.02;
     /* scout ping — one dim tracer tastes the route on the SCOUT beat */
     const pg=seg(ph,1.5,2.8);
-    if(pg>0&&pg<1){const pe=eInOut(pg),pp=c1.getPoint(pe);
-      cometAt(ping,X,pp.x,pp.y,pp.z,c1.getTangent(pe),.85,.5*Math.sin(pg*Math.PI))}
+    if(pg>0&&pg<1){const pe=eInOut(pg);c1.getPoint(pe,_pp);   /* R28 — scratch */
+      cometAt(ping,X,_pp.x,_pp.y,_pp.z,c1.getTangent(pe,_pt2),.85,.5*Math.sin(pg*Math.PI))}
     else cometAt(ping,X,0,0,0,_hd.set(1,0,0),0,0);
     /* the flow — deploy on INVEST · rotate on ROTATE · retreat after SIGNAL.
        R12 — the stream carries the story's color: BLUE while investing and
@@ -2701,6 +3158,11 @@ addSet(6,(g,X)=>{
           _hd,.6+.4*c.sh,.8*dip*c.sh)}}
     if(active&&fired(3.4))burst(t,X-4,1.9,.1,8,1.5,1.2,EBLUE);
     if(active&&fired(7.3))burst(t,X+2.5,2.35,0,6,1.3,1,EBLUE);
+    /* R25 — the invested market ticks yield; re-parks on ROTATE, dies on
+       the evacuation window (same clock as the comet stream) */
+    const rotE=eInOut(seg(ph,7.2,8.4));
+    earn.update(t,seg(ph,4.6,6)*(1-seg(ph,12.3,12.9)),
+      lerp(2.5,5.5,rotE),lerp(0,-1.5,rotE));
     /* rotation beat: aave brightens, compound steps back */
     const rot=seg(ph,7.2,8.4);
     aave.col.material.opacity=.3+.45*lerp(.7,1,rot);aave.top.material.opacity=.25+.4*lerp(.7,1,rot);
@@ -2723,7 +3185,7 @@ addSet(6,(g,X)=>{
        retreat nears; its lit rim was ghosting at the left frame edge early */
     hPadM.color.setScalar(.47*wake);
     hPadM.emissiveIntensity=(.16+.05*Math.sin(t*1.5))*wake+.24*settle;
-    hInM.emissiveIntensity=(.34+.07*Math.sin(t*2.1))*wake+.45*settle;
+    hInM.emissiveIntensity=(.40+.07*Math.sin(t*2.1))*wake+.45*settle;  /* R28 */
     hPad.scale.setScalar(1+.1*win(ph,16.9,1.1));
     hGy1.rotation.y=t*.5+2.2*sE;
     hGy2.rotation.y=-t*.34-1.6*sE;
@@ -2733,12 +3195,10 @@ addSet(6,(g,X)=>{
     gy1.material.opacity=(.05+.23*hvIn)+.3*settle;
     gy2.material.opacity=(.04+.16*hvIn)+.22*settle;
     hRip.forEach((c,i)=>c.scale.setScalar(1+.05*Math.sin(t*.8-i*.9)+.08*settle));
-    for(const b of hBeam)b.b.material.opacity=b.o*(1+1.7*settle);
     const ak=seg(ph,16.9,18.4);
     aRing.visible=ak>0&&ak<1;
     if(aRing.visible){aRing.scale.setScalar(1+eOutCubic(ak)*2.2);
       aRing.material.opacity=.6*(1-ak)}
-    hg.material.opacity=(.16+.02*Math.sin(t*1.9))*wake+.2*settle;
     orb.st.op=1-seg(ph,15.5,17.5);orb.update(t);
     host.play(ph>12.2&&ph<16.8?"protect":ph>=16.8&&ph<20.5?"cheer":"idle");
     host.update(t,dt);
@@ -2769,27 +3229,34 @@ addSet(6,(g,X)=>{
    snaps back inside. The cage itself gained depth: an inner counter-rotating
    shell, a faint additive facet skin, and vertex studs. */
 addSet(7,(g,X)=>{
+  /* R23 — a low red unease on the horizon while the thief prowls */
+  makeEnv(g,{look:"red",seed:115,stars:280,starCol:0xb98f8f,starOp:.28});
   dustGrid(g,{op:.2,seed:15});
   const v=makeVault(g,{x:-2,s:2});
   const cage=makeCage(g,{x:-2,r:2.8});
-  const cage2=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(2.42,1)),
-    new THREE.LineBasicMaterial({color:GRAY,transparent:true,opacity:.15}));
-  const facet=new THREE.Mesh(new THREE.IcosahedronGeometry(2.8,1),
-    new THREE.MeshBasicMaterial({color:WHITE,transparent:true,opacity:.026,
-      blending:THREE.AdditiveBlending,depthWrite:false}));
-  const studPts=new THREE.Points(new THREE.IcosahedronGeometry(2.8,1),
-    new THREE.PointsMaterial({color:WHITE,size:.07,transparent:true,opacity:.15,depthWrite:false}));
-  cage.grp.add(cage2,facet,studPts);
+  /* R24 — the cage depth (inner counter shell, facet skin, vertex studs)
+     moved INTO makeCage so every boundary shares it; this scene, which
+     invented the look, now just switches it on and drives it as before */
+  const cage2=cage.inner,facet=cage.facet,studPts=cage.studs;
+  cage2.visible=facet.visible=studPts.visible=true;
   const key=new THREE.Group();key.position.set(-.9,1.6,.9);g.add(key);
   key.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.OctahedronGeometry(.3)),
-    new THREE.LineBasicMaterial({color:WHITE,transparent:true,opacity:.95})),
-    glowSprite(EBLUE,1.2,.65));         /* the real scoped key — AI blue */
+    new THREE.LineBasicMaterial({color:WHITE,transparent:true,opacity:.95})));
+  /* the real scoped key — AI blue. R28 — halo quad gone; core .34→.45 */
+  /* R24 — matches the mandate's machined key: lit core + turning collar */
+  key.add(new THREE.Mesh(new THREE.OctahedronGeometry(.17),
+    new THREE.MeshBasicMaterial({color:EBLUE,transparent:true,opacity:.45,
+      blending:THREE.AdditiveBlending,depthWrite:false})));
+  {const kr=circleLine(.40,0xcdeef8,.5);kr.rotation.x=Math.PI/2;key.add(kr)}
   const tGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);
   const tether=new THREE.Line(tGeo,new THREE.LineBasicMaterial({color:GRAY,transparent:true,opacity:.4}));
   g.add(tether);
   /* the outside address — a cross, far right */
   const mk=new THREE.Group();mk.position.set(7,1.6,0);g.add(mk);
-  const mkm=new THREE.LineBasicMaterial({color:0xcc6666,transparent:true,opacity:.55});
+  /* R26 — on-palette: the cross reads the deck's danger RED (was a muddy
+     desaturated 0xcc6666, the one off-palette prop left); opacity trimmed
+     so its screen value stays where R4 verified it */
+  const mkm=new THREE.LineBasicMaterial({color:RED,transparent:true,opacity:.48});
   mk.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(
     [new THREE.Vector3(-.4,-.4,0),new THREE.Vector3(.4,.4,0)]),mkm),
     new THREE.Line(new THREE.BufferGeometry().setFromPoints(
@@ -2800,8 +3267,8 @@ addSet(7,(g,X)=>{
      Threat is contrast, not colour: near-black cloth, a faint gray rim,
      pale eye slits strobing with the swarm */
   const intr=new THREE.Group();g.add(intr);
-  const iHalo=glowSprite(RED,3.1,.16);iHalo.renderOrder=-1;  /* R12 — threat rim */
-  intr.add(iHalo);
+  /* R28 — the 3.1u threat-rim halo quad is gone: the strobing shard edges,
+     red seam accents and eye slits carry the menace (threat = contrast) */
   const thief=new Chr(intr,"intruder",1.05,{ring:false});
   thief.groundY=-.8;                 /* centre the figure on the swarm origin */
   const iR=rng(67),iShards=[];
@@ -2823,7 +3290,16 @@ addSet(7,(g,X)=>{
   tintComets(fling,RED);               /* the attack stream is danger, not funds */
   const vaultC=new THREE.Vector3(-2,1.8,0),markC=new THREE.Vector3(7,1.6,0);
   const fDir=markC.clone().sub(vaultC).normalize(),fBack=fDir.clone().negate();
-  const impact=glowSprite(RED,3.4,0);impact.position.set(.79,1.74,0);g.add(impact);
+  /* R28 — the 3.4u impact glow quad is gone: the shock rings, the red
+     burst, the seam flare and the DOM flash carry the hit */
+  /* R25 — the exfil VECTOR: while the thief flings, a thin red intent line
+     reaches from the boundary wall toward OUTSIDE — where the funds are
+     headed if the contract lets them pass. The REVERT kills it mid-air:
+     the denial and the destination read in one glance. 1 draw. */
+  const exGeo=new THREE.BufferGeometry().setFromPoints(
+    [new THREE.Vector3(.84,1.74,0),new THREE.Vector3(.84,1.74,0)]);
+  const exLine=new THREE.Line(exGeo,new THREE.LineBasicMaterial(
+    {color:RED,transparent:true,opacity:0}));exLine.visible=false;g.add(exLine);
   /* the wall's answer — R12: the whole reject reads RED (shock rings on the
      wall plane, the wire echo, the REVERT pop) — danger denied, in one hue */
   const shockA=new THREE.Mesh(new THREE.RingGeometry(.88,1,64),
@@ -2840,7 +3316,8 @@ addSet(7,(g,X)=>{
   const orb=makeOrb(g,{x:1.6,y:4.9,z:-3.8,r:.8,amp:.2,speed:1.6});
   /* R9 — the GUARDIAN shields the vault while the thief throws */
   const host=new Chr(g,"guardian",1.15);host.setPos(-3,2.6);
-  const tmp=new THREE.Vector3(),jv=new THREE.Vector3();
+  const tmp=new THREE.Vector3(),jv=new THREE.Vector3(),
+    _hv=new THREE.Vector3(),_ov=new THREE.Vector3();  /* R28 — scratch */
   let pv=-1;
   return(t,dt,tl,active)=>{const ph=tl%LOOPS[7];
     if(ph<pv)pv=-0.001;
@@ -2852,11 +3329,9 @@ addSet(7,(g,X)=>{
     /* R12 — the boundary flushes RED while it rejects, then settles back cyan */
     const fRed=clamp01(flare*2);
     cage.wire.material.color.copy(C_CGW).lerp(C_RED,fRed);
-    cage.halo.material.color.copy(C_CYAN).lerp(C_RED,fRed);
     facet.material.color.copy(C_WHITE).lerp(C_RED,fRed);
     studPts.material.color.copy(C_WHITE).lerp(C_RED,fRed);
     cage.wire.material.opacity=.5+.06*Math.sin(t*1.4)+.5*flare;
-    cage.halo.material.opacity=.08+.3*flare;
     cage.grp.rotation.y=t*.09;
     cage2.rotation.y=-t*.22;
     cage2.material.opacity=.15+.35*flare;
@@ -2869,19 +3344,18 @@ addSet(7,(g,X)=>{
     tp[3]=-2;tp[4]=1.8;tp[5]=0;tGeo.attributes.position.needsUpdate=true;
     /* mass path: approach → hover/grab → lunge → recoil → sulk orbit */
     const ap=eInOut(seg(ph,.5,3.5));
-    const hov=new THREE.Vector3(2.3+Math.sin(t*7)*.06,2+Math.sin(t*3.1)*.15,1.6+Math.cos(t*6)*.06);
-    tmp.set(lerp(10,hov.x,ap),lerp(3.4,hov.y,ap),lerp(4.5,hov.z,ap));
+    _hv.set(2.3+Math.sin(t*7)*.06,2+Math.sin(t*3.1)*.15,1.6+Math.cos(t*6)*.06);
+    tmp.set(lerp(10,_hv.x,ap),lerp(3.4,_hv.y,ap),lerp(4.5,_hv.z,ap));
     const lun=win(ph,6.15,.7),rec=win(ph,8.55,.9);
     tmp.x+=-lun*.9+rec*1.1;tmp.y-=lun*.15;tmp.z+=-lun*.45+rec*.5;
     const ob=seg(ph,10,11.4);
     if(ob>0){const a=t*.3;
-      const op2=new THREE.Vector3(-2+Math.cos(a)*4.6,2.1+.3*Math.sin(t*.7),Math.sin(a)*4.6);
-      tmp.lerp(op2,eInOut(ob))}
+      _ov.set(-2+Math.cos(a)*4.6,2.1+.3*Math.sin(t*.7),Math.sin(a)*4.6);
+      tmp.lerp(_ov,eInOut(ob))}
     intr.position.copy(tmp);
     const aggr=(ph>3&&ph<10?1:.35)+.9*win(ph,8.6,1.2);
     /* strobes — sharp asynchronous blips; the swarm breathes and snaps */
     const cs=Math.pow(Math.max(0,Math.sin(t*11.3)*Math.sin(t*4.7+1.3)),10)*Math.min(1.6,aggr);
-    iHalo.material.opacity=.13+.12*aggr+.18*cs;
     intr.scale.setScalar(1+.05*Math.sin(t*3.6)*aggr+.1*win(ph,8.55,.5));
     /* the thief acts the beats: stalk in · snatch · hurl · recoil · sulk */
     thief.lookTo(Math.atan2(-2-intr.position.x,-intr.position.z));
@@ -2919,7 +3393,14 @@ addSet(7,(g,X)=>{
         jv.z+Math.cos(t*2.2+c.j2)*.09,
         dirV,fL*(.5+.7*c.sh),fOp*c.sh)}
     if(active&&fired(8.5)){kick(.7);burst(t,X+.79,1.74,0,26,3.2,2.5,RED)}
-    impact.material.opacity=.95*win(ph,8.45,.8);
+    /* R25 — intent vector: grows with the surge, dies ON the revert */
+    const exK=seg(ph,6.5,8.4)*(1-seg(ph,8.5,8.8));
+    exLine.visible=exK>.01;
+    if(exLine.visible){const ex=exGeo.attributes.position.array;
+      const exU=eInOut(seg(ph,6.5,8.4));
+      ex[3]=lerp(.84,6.6,exU);ex[4]=lerp(1.74,1.62,exU);ex[5]=0;
+      exGeo.attributes.position.needsUpdate=true;
+      exLine.material.opacity=.28*exK*(.75+.25*Math.sin(t*9))}
     /* the wall answers — shock rings on the plane + expanding wire echo */
     const hk=seg(ph,8.5,9.6);
     shockA.visible=shockB.visible=hk>0&&hk<1;
@@ -2953,6 +3434,10 @@ addSet(7,(g,X)=>{
    the right — glowing USYC torus gate over a rippled disc. A mote-stream arcs
    the void into the ring. No painted backdrop. */
 addSet(8,(g,X)=>{
+  /* R23 — the SPLIT room: red storm-glow behind Base (−x), cyan haven-glow
+     behind Arc (+x); stars only above the sea line */
+  makeEnv(g,{look:"harbor",seed:117,stars:300,starCol:0x9fb3bd,starOp:.30,
+    yMin:2,yMax:44});
   /* the Base shore — displaced sea; flatShading lets the rig carve each facet */
   const seaGeo=new THREE.PlaneGeometry(13,17,30,22);
   const sea=new THREE.Mesh(seaGeo,new THREE.MeshStandardMaterial(
@@ -2993,11 +3478,12 @@ addSet(8,(g,X)=>{
       C.setRGB(.32+.68*p.heat,.05+.16*p.heat,.04+.10*p.heat);
       im.setColorAt(i,C)}im.instanceColor.needsUpdate=true};
     paint(plates,P);paint(slivers,S);
-    const haze=[];for(let i=0;i<7;i++){const s=glowSprite(RED,3.4+SR()*2.6,.055);
-      g.add(s);haze.push({s,r:1.2+SR()*2.6,a:SR()*6.283,w:.1+SR()*.16,
-        py:1.2+SR()*3.4,ph:SR()*6.283})}
-    const core=glowSprite(0xff2a2a,8.5,.06);core.position.set(cx,2.6,cz);
-    core.renderOrder=-1;g.add(core);
+    /* R28 — the 7 drifting haze quads (3.4-6u) and the 8.5u storm core quad
+       are REMOVED (the deck's single largest additive fill after the void
+       mist): the red storm-light, the red-lit debris, the embers and the
+       R23 harbor shell's red blob carry the storm. rng cursor burned so the
+       ember scatter stays byte-identical. */
+    for(let i=0;i<42;i++)SR();
     const emb=[];for(let i=0;i<14;i++){const s=glowSprite(0xff7a5c,.28+SR()*.3,0);
       g.add(s);emb.push({s,r:.8+SR()*3.4,a:SR()*6.283,w:.5+SR()*.9,
         ph:SR()*7,sp:.5+SR()*.6})}
@@ -3015,11 +3501,6 @@ addSet(8,(g,X)=>{
     return{update(t){
       const flick=Math.pow(Math.max(0,Math.sin(t*7.3)*Math.sin(t*3.1+1.7)),24);
       step(plates,P,t);step(slivers,S,t);
-      for(const h of haze){const a=h.a+t*h.w;
-        h.s.position.set(cx+Math.cos(a)*h.r,h.py+.3*Math.sin(t*.4+h.ph),
-          cz+Math.sin(a)*h.r*.8);
-        h.s.material.opacity=.05+.025*Math.sin(t*.7+h.ph)+.05*flick}
-      core.material.opacity=.05+.02*Math.sin(t*1.1)+.16*flick;
       for(const e of emb){const u=((t*e.sp+e.ph)%5)/5;const a=e.a+t*e.w+u*2.4;
         e.s.position.set(cx+Math.cos(a)*e.r*(1-.25*u),.5+u*4.6,
           cz+Math.sin(a)*e.r*.8*(1-.25*u));
@@ -3044,8 +3525,17 @@ addSet(8,(g,X)=>{
     emissive:CYAN,emissiveIntensity:.32});
   const torus=new THREE.Mesh(new THREE.TorusGeometry(1.02,.085,18,84),torusM);
   const or1=circleLine(1.3,CYAN,.4),or2=circleLine(1.52,GRAY,.2);
-  const heart=glowSprite(CYAN,1.5,.1);
-  ringG.add(torus,or1,or2,heart);
+  /* R28 — the ring's 1.5u heart glow quad is gone; the torus emissive
+     (and its settle flare) is the gate's light */
+  ringG.add(torus,or1,or2);
+  /* R24 — harbor engineering: 12 mooring cleats proud of the gate torus and
+     a fine outer guide band, merged to ONE draw on the ring's own material —
+     the settle flare lights the machining exactly like the ring */
+  {const gp=[];for(let i2=0;i2<12;i2++){const ga=i2/12*Math.PI*2;
+    gp.push({g:bakeGeo(new THREE.BoxGeometry(.16,.05,.06),
+      Math.cos(ga)*1.075,Math.sin(ga)*1.075,0,0,0,ga)})}
+   gp.push({g:bakeGeo(new THREE.TorusGeometry(1.20,.016,8,72),0,0,0)});
+   ringG.add(new THREE.Mesh(mergeParts(gp,false),torusM))}
   const ulab=labelBoard(g,{x:6.65,y:3.75,z:0,w:2.3,text:"USYC",sub:"SAFE HARBOR",bright:.95,
     subCol:"rgba(120,225,245,.95)"});
   /* the crossing — a bright mote-stream arcing the void into the ring */
@@ -3059,6 +3549,12 @@ addSet(8,(g,X)=>{
   g.add(tube);
   const motes=makeMotes(g,42,.33,47);
   for(const m of motes)m.s.material.color.setHex(EBLUE);  /* funds in flight — blue */
+  /* R25 — approach lights: three beacons on the last stretch of the CCTP
+     arc blink in sequence TOWARD the gate — landing guidance into harbor,
+     lit only once the crossing is running. 3 draws. */
+  const beacons=[.66,.80,.93].map((u,i)=>{
+    const s=glowSprite(CYAN,.42,0);s.position.copy(curve.getPoint(u));
+    s.visible=false;g.add(s);return{s,i}});
   /* R9 — the host stands on the calm shore, presenting the ring.
      R10 — it beckons the crossing home first; and the AGENT rides the CCTP
      stream over the void, swoops onto the harbor disc and cheers the settle */
@@ -3092,10 +3588,15 @@ addSet(8,(g,X)=>{
     const flow=.75*seg(ph,6.5,8.5);
     streamMotes(motes,curve,t*.11,t,flow,.08);
     tube.material.opacity=(.09+.05*win(ph,9,4))*seg(ph,6.5,8.5);
+    /* R25 — approach lights chase toward the ring while the crossing runs */
+    const bcnK=seg(ph,6.8,8.2);
+    for(const b of beacons){
+      const pl2=Math.pow(Math.max(0,Math.sin(t*2.6-b.i*1.05)),12);
+      b.s.visible=bcnK>.02;
+      b.s.material.opacity=bcnK*(.05+.30*pl2)}
     /* the ring brightens as the funds settle */
     const settle=seg(ph,13,16);
-    torusM.emissiveIntensity=.3+.06*Math.sin(t*1.3)+.2*settle;
-    heart.material.opacity=.09+.02*Math.sin(t*1.7)+.06*settle;
+    torusM.emissiveIntensity=.34+.06*Math.sin(t*1.3)+.24*settle;  /* R28 comp */
     or1.rotation.z=t*.5;or2.rotation.z=-t*.34;
     ringG.scale.setScalar(1+.04*Math.sin(t*1.1)+.06*settle);
     ripples.forEach((c,i)=>c.scale.setScalar(1+.05*Math.sin(t*.8-i*.9)));
@@ -3112,7 +3613,7 @@ addSet(8,(g,X)=>{
        onto the disc left of the host, and cheers as the ring flares */
     const ru=seg(ph,8.2,12.4);
     agent.pivot.visible=ph>8.2;
-    if(ru>0&&ru<1){const pe=eInOut(ru);_ap.copy(curve.getPoint(pe*.9));
+    if(ru>0&&ru<1){const pe=eInOut(ru);curve.getPoint(pe*.9,_ap);  /* R28 */
       const land=seg(ru,.86,1);
       agent.setPos(lerp(_ap.x,4.15,land),lerp(_ap.z,1.9,land));
       agent.groundY=lerp(_ap.y,.04,land);
@@ -3128,6 +3629,7 @@ addSet(8,(g,X)=>{
 
 /* 9 · PROOF — the orb holds steady behind the receipts; the host stands by */
 addSet(9,(g)=>{
+  makeEnv(g,{look:"cyan",seed:119});   /* R23 — calm cyan behind the receipts */
   dustGrid(g,{op:.2,seed:27});
   const orb=makeOrb(g,{x:0,y:2.35,z:0,r:1.5,amp:.09,speed:.7});
   orb.st.op=.6;
@@ -3153,6 +3655,8 @@ addSet(9,(g)=>{
 
 /* 10 · CLOSE — calm, three quiet lights */
 addSet(10,(g)=>{
+  /* R23 — the homecoming night: the deck's starriest, warmest-cyan sky */
+  makeEnv(g,{look:"cyan",seed:121,stars:440,starCol:0xbfe4ef,starOp:.42});
   dustGrid(g,{op:.26,seed:29});
   const v=makeVault(g,{s:1.3,y:1.45});
   const nodes=[[-3.6,.5,2.4],[0,.45,3],[3.6,.5,2.4]].map((p,i)=>{
@@ -3485,11 +3989,24 @@ function go(i){
   /* first advance arms the rehearsal timer — but not in ?auto=1 (a timer chip
      in the middle of every recorded frame); T still toggles it manually */
   if(!AUTO&&!timerOn&&i>0){timerOn=true;timerStart=performance.now();$("timer").classList.add("show")}}
+/* R23 — perf HUD state. P toggles (see keydown); OFF by default; a dev/
+   verify tool, so it works with ?chrome=0 but NEVER under ?capture (the
+   external clock makes wall-time fps meaningless, and render.sh's frames
+   must stay byte-identical). While the HUD is on, renderer.info.autoReset
+   is disabled so frame() can count draw calls across the whole multi-pass
+   frame (scene + 4 bloom passes); toggling off restores the default. */
+const perfEl=$("perf");
+let perfOn=false,perfN=0,perfLast=0,perfCalls=0;
+function perfToggle(){perfOn=!perfOn;
+  renderer.info.autoReset=!perfOn;
+  perfEl.style.display=perfOn?"block":"none";
+  perfN=0;perfLast=performance.now();
+  if(perfOn)perfEl.textContent="… FPS"}
 addEventListener("keydown",e=>{
   if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();go(cur+1)}
   else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();go(cur-1)}
   else if(e.key>="1"&&e.key<="9")go(+e.key-1);
-  else if(e.key==="0")go(9);                    /* R14 — 0 = scene 10 (PROOF) */
+  else if(e.key==="0")go(9);                    /* 0 = scene 10 (PROOF) */
   else if(e.key==="-"||e.key==="=")go(SLIDES.length-1);   /* close (11) */
   else if(e.key==="n"||e.key==="N")$("notes").classList.toggle("show");
   else if(e.key==="t"||e.key==="T"){timerOn=!timerOn;
@@ -3498,6 +4015,7 @@ addEventListener("keydown",e=>{
   else if(e.key==="r"||e.key==="R")timerStart=performance.now();
   else if(e.key==="f"||e.key==="F"){document.fullscreenElement?
     document.exitFullscreen():document.documentElement.requestFullscreen()}
+  else if((e.key==="p"||e.key==="P")&&!CAP)perfToggle();
   else if(e.key==="Home")go(0);else if(e.key==="End")go(SLIDES.length-1)});
 canvas.addEventListener("pointerdown",e=>{dragging=true;moved=false;downX=e.clientX;downY=e.clientY});
 addEventListener("pointermove",e=>{if(!dragging)return;
@@ -3536,6 +4054,7 @@ function animate(){
   requestAnimationFrame(animate);
   frame()}
 function frame(){
+  if(perfOn)renderer.info.reset();     /* R23 — count the WHOLE frame's calls */
   const nowMs=NOWMS(),dt=Math.min(.05,(nowMs-lastMs)/1000);lastMs=nowMs;
   const t=nowMs/1000-t0;
   const tl=Math.max(0,t-(enterT-t0)),ph=tl%LOOPS[cur];
@@ -3592,6 +4111,7 @@ function frame(){
   stepPhase(tl);
   layerStep(ph,tl,t);
   scene.fog.density+=(FOGD[cur]-scene.fog.density)*Math.min(1,dt*3);
+  rimL.color.lerp(RIMTINT[cur],Math.min(1,dt*3));   /* R26 — semantic rim */
   if(timerOn){const el=(performance.now()-timerStart)/1000;
     $("tm-el").textContent=fmt(el);
     $("timer").classList.toggle("over",el>cume[cur])}
@@ -3600,7 +4120,14 @@ function frame(){
   {const gs=Math.floor(t*8);
    grainEl.style.backgroundPosition=
      `${(gs*97)%240}px ${(gs*61)%240}px`}
-  if(POST)POST.render();else renderer.render(scene,camera)}
+  if(POST)POST.render();else renderer.render(scene,camera);
+  /* R23 — perf HUD sampling: smoothed over ~500ms wall time, ~2 updates/sec.
+     Never under ?capture (guarded twice: the toggle and here). */
+  if(perfOn&&!CAP){perfCalls=renderer.info.render.calls;perfN++;
+    const pn=performance.now();
+    if(pn-perfLast>=500){const ms=(pn-perfLast)/perfN;
+      perfEl.innerHTML=`<b>${(1000/ms).toFixed(0)}</b> FPS · ${ms.toFixed(1)} ms · ${perfCalls} calls`;
+      perfN=0;perfLast=pn}}}
 /* ?capture=1 — install the external-clock hooks instead of the rAF loop.
    Harness contract per frame: __capStep() (advance 1/fps, run due virtual
    timeouts in order, render, seek CSS animations) → await __capSettle()

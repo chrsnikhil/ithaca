@@ -48,3 +48,8 @@ cloudflared*
 /style-preview.html
 /images.jpeg
 /char*.png
+
+# ─── heavy media (demo video is a hosted link, not in the repo) ───
+*.mp4
+*.mp3
+*.docx
